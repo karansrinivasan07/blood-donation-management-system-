@@ -26,21 +26,24 @@ exports.register = async (req, res) => {
 
         await user.save();
 
+        // Safety check for details object
+        const userDetails = details || {};
+
         if (role === 'DONOR') {
             const donorProfile = new DonorProfile({
                 userId: user._id,
-                bloodGroup: details.bloodGroup,
-                city: details.city,
-                pincode: details.pincode
+                bloodGroup: userDetails.bloodGroup,
+                city: userDetails.city,
+                pincode: userDetails.pincode
             });
             await donorProfile.save();
         } else if (role === 'HOSPITAL') {
             const hospitalProfile = new HospitalProfile({
                 userId: user._id,
-                hospitalName: details.hospitalName,
-                address: details.address,
-                city: details.city,
-                pincode: details.pincode
+                hospitalName: userDetails.hospitalName,
+                address: userDetails.address,
+                city: userDetails.city,
+                pincode: userDetails.pincode
             });
             await hospitalProfile.save();
         }
