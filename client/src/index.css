@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: 225 29 72;
+    --secondary: 37 99 235;
+  }
+}
+
+.glass-card {
+  @apply bg-white bg-opacity-70 backdrop-blur-md border border-white border-opacity-30 rounded-2xl shadow-xl;
+}
+
+.btn-primary {
+  @apply px-6 py-2 bg-medical-primary text-white rounded-lg hover:bg-medical-primary/90 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md;
+}
+
+.btn-secondary {
+  @apply px-6 py-2 bg-medical-secondary text-white rounded-lg hover:bg-medical-secondary/90 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md;
+}
+
+.input-group {
+  @apply relative flex items-center;
+}
+
+.input-group svg {
+  @apply absolute left-3 text-gray-400 transition-colors pointer-events-none;
+}
+
+.input-group:focus-within svg {
+  @apply text-medical-primary;
+}
+
+.input-field {
+  @apply w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-medical-primary/20 focus:border-medical-primary transition-all;
+}
+
+.badge-urgent {
+  @apply px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700;
+}
+
+.badge-normal {
+  @apply px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700;
+}
+
+.badge-critical {
+  @apply px-2 py-1 text-xs font-semibold rounded-full bg-red-600 text-white animate-pulse;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-medical-primary/30 rounded-full hover:bg-medical-primary/50 transition-all;
+}
