@@ -50,6 +50,10 @@ exports.register = async (req, res) => {
             role: user.role
         };
 
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is not defined in environment variables');
+        }
+
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.status(201).json({
