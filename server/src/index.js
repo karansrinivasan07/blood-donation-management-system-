@@ -17,9 +17,25 @@ connectDB();
 
 // Middleware
 const corsOptions = {
-    origin: process.env.CLIENT_URL || '*',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'https://flashsaver.vercel.app',
+            process.env.CLIENT_URL
+        ].filter(Boolean);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 app.use(express.json());
