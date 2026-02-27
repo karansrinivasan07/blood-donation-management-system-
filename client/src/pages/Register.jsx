@@ -45,7 +45,9 @@ const Register = () => {
             if (role === 'DONOR') navigate('/donor/dashboard');
             else navigate('/hospital/dashboard');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Registration failed');
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Registration failed';
+            toast.error(errorMsg);
+            console.error('Detailed Registration Error:', err.response?.data);
         } finally {
             setLoading(false);
         }

@@ -69,10 +69,12 @@ exports.register = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('Registration Error:', err);
-        res.status(500).json({
-            message: 'Registration failed',
-            error: err.message
+        console.error('REGISTRATION ERROR FULL:', err);
+        return res.status(500).json({
+            message: 'Registration failed at server',
+            error: err.message,
+            name: err.name,
+            code: err.code // Helpful for MongoDB duplicate keys
         });
     }
 };
