@@ -52,6 +52,15 @@ app.get('/', (req, res) => {
     res.send('Blood Donation API is running...');
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err.stack);
+    res.status(500).json({
+        message: 'Internal Server Error',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 
 // Only listen if not running as a Vercel serverless function
