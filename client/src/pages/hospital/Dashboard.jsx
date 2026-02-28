@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Clock, Users, ArrowRight, Activity, Droplet, QrCode } from 'lucide-react';
+import { Plus, Clock, Users, ArrowRight, Activity, Droplet, QrCode, MapPin } from 'lucide-react';
 import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
@@ -10,6 +10,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState({ active: 0, fulfilled: 0, totalPledges: 0 });
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [scanResult, setScanResult] = useState(null);
 
     useEffect(() => {
         fetchRequests();
@@ -34,11 +35,22 @@ const Dashboard = () => {
 
     const handleScan = (decodedText) => {
         setIsScannerOpen(false);
-        if (decodedText.startsWith('https://www.google.com/maps')) {
-            toast.success('Donor location found!');
-            window.open(decodedText, '_blank');
-        } else {
-            toast.error('Invalid QR Code');
+        try {
+            const data = JSON.parse(decodedText);
+            if (data.type === 'BLOOD_DONOR') {
+                setScanResult(data);
+                toast.success('Donor details scanned!');
+            } else {
+                toast.error('Invalid QR Code format');
+            }
+        } catch (err) {
+            // Fallback for old simple URL QRs
+            if (decodedText.startsWith('https://www.google.com/maps')) {
+                window.open(decodedText, '_blank');
+                toast.success('Opening location maps...');
+            } else {
+                toast.error('Could not parse QR code');
+            }
         }
     };
 
@@ -49,6 +61,45 @@ const Dashboard = () => {
                     onScan={handleScan}
                     onClose={() => setIsScannerOpen(false)}
                 />
+            )}
+
+            {scanResult && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-100 bg-medical-primary text-white flex justify-between items-center">
+                            <h2 className="text-xl font-bold">Donor Found</h2>
+                            <button onClick={() => setScanResult(null)}><Plus className="rotate-45" /></button>
+                        </div>
+                        <div className="p-8 space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 bg-medical-primary/10 rounded-2xl flex items-center justify-center text-medical-primary text-2xl font-bold">
+                                    {scanResult.bloodGroup}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-800">{scanResult.name}</h3>
+                                    <p className="text-gray-500 flex items-center gap-1"><MapPin size={14} /> {scanResult.city}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Coordinates</p>
+                                <p className="text-sm font-mono text-gray-600">
+                                    {scanResult.location?.lat ? `${scanResult.location.lat.toFixed(4)}, ${scanResult.location.lng.toFixed(4)}` : 'City Center'}
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    window.open(scanResult.mapsUrl, '_blank');
+                                    setScanResult(null);
+                                }}
+                                className="btn-primary w-full py-4 flex items-center justify-center gap-2 text-lg font-bold"
+                            >
+                                <MapPin size={20} /> Open Location in Maps
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
             <div className="relative h-48 rounded-3xl overflow-hidden shadow-lg p-8 flex items-center bg-medical-dark text-white mb-6">
                 <div className="z-10 relative">

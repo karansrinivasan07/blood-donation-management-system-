@@ -13,7 +13,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { bloodGroup, city, pincode, isAvailable, lastDonationDate } = req.body;
+        const { bloodGroup, city, pincode, isAvailable, lastDonationDate, location } = req.body;
         let profile = await DonorProfile.findOne({ userId: req.user.id });
 
         if (!profile) {
@@ -25,6 +25,7 @@ exports.updateProfile = async (req, res) => {
         profile.pincode = pincode || profile.pincode;
         profile.isAvailable = isAvailable !== undefined ? isAvailable : profile.isAvailable;
         profile.lastDonationDate = lastDonationDate || profile.lastDonationDate;
+        profile.location = location || profile.location;
 
         await profile.save();
         res.json(profile);

@@ -12,7 +12,8 @@ const Profile = () => {
         city: profile?.city || '',
         pincode: profile?.pincode || '',
         isAvailable: profile?.isAvailable ?? true,
-        lastDonationDate: profile?.lastDonationDate ? new Date(profile.lastDonationDate).toISOString().split('T')[0] : ''
+        lastDonationDate: profile?.lastDonationDate ? new Date(profile.lastDonationDate).toISOString().split('T')[0] : '',
+        location: profile?.location || { lat: null, lng: null }
     });
     const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,8 @@ const Profile = () => {
                 city: profile.city || '',
                 pincode: profile.pincode || '',
                 isAvailable: profile.isAvailable ?? true,
-                lastDonationDate: profile.lastDonationDate ? new Date(profile.lastDonationDate).toISOString().split('T')[0] : ''
+                lastDonationDate: profile.lastDonationDate ? new Date(profile.lastDonationDate).toISOString().split('T')[0] : '',
+                location: profile.location || { lat: null, lng: null }
             });
         }
     }, [profile]);
@@ -88,14 +90,17 @@ const Profile = () => {
                                         if (navigator.geolocation) {
                                             navigator.geolocation.getCurrentPosition(async (position) => {
                                                 const { latitude, longitude } = position.coords;
-                                                // Using a simple reverse geocoding approach or just showing coordinates
-                                                // For now, let's just toast that we got the location and try to fetch city if possible
                                                 try {
                                                     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                                                     const data = await res.json();
                                                     const city = data.address.city || data.address.town || data.address.village || '';
                                                     const pincode = data.address.postcode || '';
-                                                    setFormData(prev => ({ ...prev, city, pincode }));
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        city,
+                                                        pincode,
+                                                        location: { lat: latitude, lng: longitude }
+                                                    }));
                                                     toast.success('Location updated!');
                                                 } catch (err) {
                                                     toast.error('Could not fetch city name');
@@ -168,7 +173,16 @@ const Profile = () => {
                 <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-4">
                     <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100" id="donor-qr">
                         <QRCodeSVG
-                            value={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.city + ' ' + (profile?.pincode || ''))}`}
+                            value={JSON.stringify({
+                                type: 'BLOOD_DONOR',
+                                name: user?.name,
+                                bloodGroup: profile?.bloodGroup,
+                                city: profile?.city,
+                                location: profile?.location,
+                                mapsUrl: profile?.location?.lat
+                                    ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
+                                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.city + ' ' + (profile?.pincode || ''))}`
+                            })}
                             size={160}
                             level="H"
                             includeMargin={true}
