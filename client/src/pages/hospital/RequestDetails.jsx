@@ -44,7 +44,8 @@ const RequestDetails = () => {
             toast.success('Status updated');
             fetchData();
         } catch (err) {
-            toast.error('Update failed');
+            const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Update failed';
+            toast.error(errorMsg);
         }
     };
 
@@ -54,7 +55,8 @@ const RequestDetails = () => {
             toast.success('Request updated');
             fetchData();
         } catch (err) {
-            toast.error('Update failed');
+            const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Update failed';
+            toast.error(errorMsg);
         }
     };
 

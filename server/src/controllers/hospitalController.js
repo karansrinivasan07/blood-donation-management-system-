@@ -1,6 +1,7 @@
 const HospitalProfile = require('../models/HospitalProfile');
 const BloodRequest = require('../models/BloodRequest');
 const Pledge = require('../models/Pledge');
+const DonorProfile = require('../models/DonorProfile');
 
 exports.getProfile = async (req, res) => {
     try {
