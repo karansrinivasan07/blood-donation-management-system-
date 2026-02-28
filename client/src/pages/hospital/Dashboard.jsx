@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Clock, Users, ArrowRight, Activity, Droplet, QrCode, MapPin } from 'lucide-react';
+import { Plus, Clock, Users, ArrowRight, Activity, Droplet, QrCode, MapPin, Download } from 'lucide-react';
 import QRScanner from '../../components/QRScanner';
+import { useAuth } from '../../context/AuthContext';
+import { QRCodeSVG } from 'qrcode.react';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
@@ -11,6 +13,8 @@ const Dashboard = () => {
     const [metrics, setMetrics] = useState({ active: 0, fulfilled: 0, totalPledges: 0 });
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [scanResult, setScanResult] = useState(null);
+
+    const { profile } = useAuth();
 
     useEffect(() => {
         fetchRequests();
@@ -31,6 +35,26 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDownloadQR = () => {
+        const svg = document.querySelector('#camp-qr-dash svg');
+        if (!svg) return;
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const png = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `camp-qr-${profile?.hospitalName}.png`;
+            link.href = png;
+            link.click();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
     };
 
     const handleScan = (decodedText) => {
@@ -126,33 +150,74 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
-            <div className="relative h-48 rounded-3xl overflow-hidden shadow-lg p-8 flex items-center bg-medical-dark text-white mb-6">
-                <div className="z-10 relative">
-                    <h1 className="text-3xl font-black mb-1">Empowering Healthcare</h1>
-                    <p className="text-gray-400">Manage your blood requests and find local heroes in our community.</p>
-                </div>
-                <img
-                    src="/assets/superhero_banner.png"
-                    className="absolute right-0 top-0 h-full w-2/3 object-cover opacity-30 mix-blend-screen"
-                    style={{ maskImage: 'linear-gradient(to left, white, transparent)' }}
-                />
-            </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold">Hospital Dashboard</h1>
-                    <p className="text-gray-500">Manage your blood requests and donor pledges</p>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Main Welcome Section */}
+                <div className="lg:col-span-3 space-y-6">
+                    <div className="relative h-48 rounded-3xl overflow-hidden shadow-lg p-8 flex items-center bg-medical-dark text-white">
+                        <div className="z-10 relative">
+                            <h1 className="text-3xl font-black mb-1">Welcome, {profile?.hospitalName || 'Health Center'}</h1>
+                            <p className="text-gray-400">Empowering lives through your institutional contributions.</p>
+                        </div>
+                        <img
+                            src="/assets/superhero_banner.png"
+                            className="absolute right-0 top-0 h-full w-2/3 object-cover opacity-30 mix-blend-screen"
+                            style={{ maskImage: 'linear-gradient(to left, white, transparent)' }}
+                        />
+                    </div>
+
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold">Hospital Dashboard</h1>
+                            <p className="text-gray-500 italic">Manage requests and scan donor locations</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setIsScannerOpen(true)}
+                                className="btn-primary flex items-center gap-2 h-fit"
+                            >
+                                <QrCode size={20} /> Scan Donor QR
+                            </button>
+                            <Link to="/hospital/create-request" className="btn-secondary flex items-center gap-2 text-nowrap h-fit">
+                                <Plus size={20} /> Post New Request
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setIsScannerOpen(true)}
-                        className="btn-primary flex items-center gap-2"
-                    >
-                        <QrCode size={20} /> Scan Donor QR
-                    </button>
-                    <Link to="/hospital/create-request" className="btn-secondary flex items-center gap-2 text-nowrap">
-                        <Plus size={20} /> Post New Request
-                    </Link>
+
+                {/* QR Code Sidebar Card */}
+                <div className="lg:col-span-1">
+                    <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-3 border-t-4 border-medical-secondary h-full">
+                        <div className="bg-white p-2 rounded-2xl shadow-md border border-gray-50 mb-1" id="camp-qr-dash">
+                            <QRCodeSVG
+                                value={JSON.stringify({
+                                    type: 'BLOOD_CAMP',
+                                    name: profile?.hospitalName,
+                                    address: profile?.address,
+                                    city: profile?.city,
+                                    email: profile?.contactEmail,
+                                    phone: profile?.contactPhone,
+                                    isActive: profile?.isCampActive,
+                                    location: profile?.location,
+                                    mapsUrl: profile?.location?.lat
+                                        ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
+                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.hospitalName + ' ' + (profile?.city || ''))}`
+                                })}
+                                size={120}
+                                level="H"
+                            />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-gray-800 text-sm">{profile?.hospitalName}</h4>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">Camp Location QR</p>
+                        </div>
+                        <button
+                            onClick={handleDownloadQR}
+                            className="text-[10px] bg-gray-50 hover:bg-gray-100 text-medical-secondary px-3 py-1.5 rounded-lg font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+                        >
+                            <Download size={12} /> Download QR
+                        </button>
+                    </div>
                 </div>
             </div>
 
