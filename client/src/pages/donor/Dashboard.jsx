@@ -2,17 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { Search, MapPin, Droplets, Clock, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Droplets, Clock, ChevronRight, HeartPulse, Activity } from 'lucide-react';
 
 const Dashboard = () => {
     const { profile } = useAuth();
     const [requests, setRequests] = useState([]);
+    const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
 
     useEffect(() => {
         fetchRequests();
+        fetchHistory();
     }, [filters]);
+
+    const fetchHistory = async () => {
+        try {
+            const { data } = await api.get('/donor/pledges');
+            const completed = data.filter(p => p.status === 'COMPLETED');
+            setHistory(completed);
+        } catch (err) {
+            console.error('History fetch error:', err);
+        }
+    };
 
     const fetchRequests = async () => {
         try {
@@ -46,6 +58,36 @@ const Dashboard = () => {
                 </div>
             </div>
 
+            {/* CONTRIBUTION HISTORY SECTION */}
+            {history.length > 0 && (
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-medical-primary/10 rounded-lg text-medical-primary">
+                            <HeartPulse size={24} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold">Hospitals You've Saved</h2>
+                            <p className="text-sm text-gray-500">Your heroic history of blood donations</p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                        {Array.from(new Set(history.map(p => p.requestId?.hospitalProfile?.hospitalName))).map((hospitalName, idx) => (
+                            <div key={idx} className="flex-shrink-0 bg-gray-50 px-6 py-4 rounded-2xl flex items-center gap-4 border border-gray-100 hover:border-medical-primary transition-colors group">
+                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-medical-primary shadow-sm group-hover:bg-medical-primary group-hover:text-white transition-colors">
+                                    <Activity size={18} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-800">{hospitalName}</p>
+                                    <p className="text-[10px] text-medical-primary font-bold uppercase tracking-widest">Life Saved</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )
+            }
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">Find Blood Requests</h1>
@@ -74,53 +116,55 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[1, 2, 3].map(i => <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse"></div>)}
-                </div>
-            ) : requests.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {requests.map((request) => (
-                        <div key={request._id} className="glass-card p-6 hover:shadow-2xl transition-all border-l-4 border-medical-primary">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-12 h-12 bg-medical-primary/10 rounded-xl flex items-center justify-center text-medical-primary font-bold">
-                                    {request.bloodGroup}
+            {
+                loading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse"></div>)}
+                    </div>
+                ) : requests.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {requests.map((request) => (
+                            <div key={request._id} className="glass-card p-6 hover:shadow-2xl transition-all border-l-4 border-medical-primary">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 bg-medical-primary/10 rounded-xl flex items-center justify-center text-medical-primary font-bold">
+                                        {request.bloodGroup}
+                                    </div>
+                                    <span className={`badge-${request.urgency.toLowerCase()}`}>
+                                        {request.urgency}
+                                    </span>
                                 </div>
-                                <span className={`badge-${request.urgency.toLowerCase()}`}>
-                                    {request.urgency}
-                                </span>
-                            </div>
 
-                            <h3 className="font-bold text-lg mb-1">{request.hospitalProfile?.hospitalName || 'City Hospital'}</h3>
-                            <div className="space-y-2 text-sm text-gray-600 mb-6">
-                                <div className="flex items-center gap-2">
-                                    <MapPin size={14} /> {request.hospitalProfile?.city || 'Unknown City'}
+                                <h3 className="font-bold text-lg mb-1">{request.hospitalProfile?.hospitalName || 'City Hospital'}</h3>
+                                <div className="space-y-2 text-sm text-gray-600 mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <MapPin size={14} /> {request.hospitalProfile?.city || 'Unknown City'}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Droplets size={14} /> {request.unitsRequired} Units Required
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={14} /> Before {new Date(request.requiredBefore).toLocaleDateString()}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <Droplets size={14} /> {request.unitsRequired} Units Required
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Clock size={14} /> Before {new Date(request.requiredBefore).toLocaleDateString()}
-                                </div>
-                            </div>
 
-                            <Link
-                                to={`/donor/requests/${request._id}`}
-                                className="w-full btn-primary py-2.5 flex items-center justify-center gap-2"
-                            >
-                                View Details <ChevronRight size={18} />
-                            </Link>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-20 bg-gray-50 rounded-3xl">
-                    <Droplets className="mx-auto text-gray-300 mb-4" size={48} />
-                    <h3 className="text-xl font-bold text-gray-500">No requests found</h3>
-                    <p className="text-gray-400">Try changing your filters or location</p>
-                </div>
-            )}
-        </div>
+                                <Link
+                                    to={`/donor/requests/${request._id}`}
+                                    className="w-full btn-primary py-2.5 flex items-center justify-center gap-2"
+                                >
+                                    View Details <ChevronRight size={18} />
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-20 bg-gray-50 rounded-3xl">
+                        <Droplets className="mx-auto text-gray-300 mb-4" size={48} />
+                        <h3 className="text-xl font-bold text-gray-500">No requests found</h3>
+                        <p className="text-gray-400">Try changing your filters or location</p>
+                    </div>
+                )
+            }
+        </div >
     );
 };
 
