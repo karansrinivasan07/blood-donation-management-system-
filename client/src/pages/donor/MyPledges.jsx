@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Calendar, MapPin, Building2, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Calendar, MapPin, Building2, CheckCircle2, Clock, XCircle, QrCode, Download } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { QRCodeSVG } from 'qrcode.react';
 
 const MyPledges = () => {
+    const { user, profile } = useAuth();
     const [pledges, setPledges] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -20,6 +23,26 @@ const MyPledges = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDownloadQR = (pledgeId) => {
+        const svg = document.querySelector(`#qr-${pledgeId} svg`);
+        if (!svg) return;
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const png = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `donor-pledge-qr.png`;
+            link.href = png;
+            link.click();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
     };
 
     const getStatusStyle = (status) => {
@@ -70,7 +93,7 @@ const MyPledges = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-col md:flex-row items-center gap-6">
                                 <div className="flex flex-col items-end gap-2">
                                     {pledge.status === 'COMPLETED' && pledge.completedAt ? (
                                         <div className="text-right">
@@ -88,6 +111,35 @@ const MyPledges = () => {
                                         {pledge.status}
                                     </div>
                                 </div>
+
+                                {pledge.status !== 'CANCELLED' && (
+                                    <div className="flex flex-col items-center gap-2 pl-6 border-l border-gray-100">
+                                        <div className="bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm" id={`qr-${pledge._id}`}>
+                                            <QRCodeSVG
+                                                value={JSON.stringify({
+                                                    type: 'BLOOD_DONOR',
+                                                    name: user?.name,
+                                                    bloodGroup: profile?.bloodGroup,
+                                                    city: profile?.city,
+                                                    location: profile?.location,
+                                                    pledgeId: pledge._id,
+                                                    requestId: pledge.requestId?._id,
+                                                    mapsUrl: profile?.location?.lat
+                                                        ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
+                                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.city + ' ' + (profile?.pincode || ''))}`
+                                                })}
+                                                size={80}
+                                                level="H"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => handleDownloadQR(pledge._id)}
+                                            className="text-[10px] text-gray-400 font-bold hover:text-medical-secondary flex items-center gap-1 uppercase tracking-tighter"
+                                        >
+                                            <Download size={10} /> Save QR
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

@@ -166,64 +166,13 @@ const Profile = () => {
                 </form>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex gap-4">
-                    <div className="p-3 bg-white rounded-xl text-medical-primary h-fit shadow-sm"><User size={24} /></div>
-                    <div>
-                        <h4 className="font-bold text-gray-800">Account Details</h4>
-                        <p className="text-sm text-gray-500">Name: {user?.name}</p>
-                        <p className="text-sm text-gray-500">Email: {user?.email}</p>
-                        <p className="text-sm text-gray-400 mt-2 italic">To change account details, contact support.</p>
-                    </div>
-                </div>
-
-                <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-4">
-                    <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100" id="donor-qr">
-                        <QRCodeSVG
-                            value={JSON.stringify({
-                                type: 'BLOOD_DONOR',
-                                name: user?.name,
-                                bloodGroup: profile?.bloodGroup,
-                                city: profile?.city,
-                                location: profile?.location,
-                                mapsUrl: profile?.location?.lat
-                                    ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
-                                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.city + ' ' + (profile?.pincode || ''))}`
-                            })}
-                            size={160}
-                            level="H"
-                            includeMargin={true}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-gray-800">Donor Location QR</h4>
-                        <p className="text-xs text-gray-500 max-w-[200px] mb-4">
-                            Hospitals can scan this to quickly find your donation location
-                        </p>
-                        <button
-                            onClick={() => {
-                                const canvas = document.querySelector('#donor-qr svg');
-                                const svgData = new XMLSerializer().serializeToString(canvas);
-                                const canvasElement = document.createElement('canvas');
-                                const ctx = canvasElement.getContext('2d');
-                                const img = new Image();
-                                img.onload = () => {
-                                    canvasElement.width = img.width;
-                                    canvasElement.height = img.height;
-                                    ctx.drawImage(img, 0, 0);
-                                    const pngFile = canvasElement.toDataURL('image/png');
-                                    const downloadLink = document.createElement('a');
-                                    downloadLink.download = `donor-qr-${user?.name}.png`;
-                                    downloadLink.href = pngFile;
-                                    downloadLink.click();
-                                };
-                                img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-                            }}
-                            className="text-medical-primary text-sm font-bold hover:underline flex items-center gap-1 mx-auto"
-                        >
-                            <QrCode size={14} /> Download QR Code
-                        </button>
-                    </div>
+            <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex gap-4">
+                <div className="p-3 bg-white rounded-xl text-medical-primary h-fit shadow-sm"><User size={24} /></div>
+                <div>
+                    <h4 className="font-bold text-gray-800">Account Details</h4>
+                    <p className="text-sm text-gray-500">Name: {user?.name}</p>
+                    <p className="text-sm text-gray-500">Email: {user?.email}</p>
+                    <p className="text-sm text-gray-400 mt-2 italic">To change account details, contact support.</p>
                 </div>
             </div>
         </div>
