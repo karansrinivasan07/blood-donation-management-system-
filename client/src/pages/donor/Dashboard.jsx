@@ -8,7 +8,7 @@ const Dashboard = () => {
     const { profile } = useAuth();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState({ city: profile?.city || '', bloodGroup: '' });
+    const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
 
     useEffect(() => {
         fetchRequests();
@@ -16,7 +16,7 @@ const Dashboard = () => {
 
     const fetchRequests = async () => {
         try {
-            const { data } = await api.get('/requests', { params: { ...filters, status: 'OPEN' } });
+            const { data } = await api.get('/requests', { params: { ...filters } });
             setRequests(data);
         } catch (err) {
             console.error(err);

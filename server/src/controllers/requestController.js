@@ -6,8 +6,11 @@ exports.getAllRequests = async (req, res) => {
         let query = {};
 
         if (bloodGroup) query.bloodGroup = bloodGroup;
-        if (status) query.status = status;
-        else query.status = 'OPEN';
+        if (status && status !== 'ALL') {
+            query.status = status;
+        } else if (status !== 'ALL') {
+            query.status = { $in: ['OPEN', 'PARTIAL'] };
+        }
 
         let requests = await BloodRequest.find(query)
             .populate('hospitalProfile')
