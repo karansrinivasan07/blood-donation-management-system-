@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Clock, Users, ArrowRight, Activity, Droplet } from 'lucide-react';
+import { Plus, Clock, Users, ArrowRight, Activity, Droplet, QrCode } from 'lucide-react';
+import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState({ active: 0, fulfilled: 0, totalPledges: 0 });
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -30,8 +32,24 @@ const Dashboard = () => {
         }
     };
 
+    const handleScan = (decodedText) => {
+        setIsScannerOpen(false);
+        if (decodedText.startsWith('https://www.google.com/maps')) {
+            toast.success('Donor location found!');
+            window.open(decodedText, '_blank');
+        } else {
+            toast.error('Invalid QR Code');
+        }
+    };
+
     return (
         <div className="space-y-8">
+            {isScannerOpen && (
+                <QRScanner
+                    onScan={handleScan}
+                    onClose={() => setIsScannerOpen(false)}
+                />
+            )}
             <div className="relative h-48 rounded-3xl overflow-hidden shadow-lg p-8 flex items-center bg-medical-dark text-white mb-6">
                 <div className="z-10 relative">
                     <h1 className="text-3xl font-black mb-1">Empowering Healthcare</h1>
@@ -44,14 +62,22 @@ const Dashboard = () => {
                 />
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">Hospital Dashboard</h1>
                     <p className="text-gray-500">Manage your blood requests and donor pledges</p>
                 </div>
-                <Link to="/hospital/create-request" className="btn-secondary flex items-center gap-2">
-                    <Plus size={20} /> Post New Request
-                </Link>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => setIsScannerOpen(true)}
+                        className="btn-primary flex items-center gap-2"
+                    >
+                        <QrCode size={20} /> Scan Donor QR
+                    </button>
+                    <Link to="/hospital/create-request" className="btn-secondary flex items-center gap-2 text-nowrap">
+                        <Plus size={20} /> Post New Request
+                    </Link>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
