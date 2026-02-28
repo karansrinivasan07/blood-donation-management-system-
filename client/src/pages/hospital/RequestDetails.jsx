@@ -111,14 +111,19 @@ const RequestDetails = () => {
                                         <div className="flex gap-4">
                                             <div className="p-3 bg-gray-100 rounded-full h-fit"><User size={24} /></div>
                                             <div>
-                                                <h4 className="font-bold text-lg">{pledge.donorId.name}</h4>
-                                                <p className="text-sm text-gray-500 flex items-center gap-1"><Phone size={14} /> {pledge.donorId.phone}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="font-bold text-lg">{pledge.donorId?.name || 'Unknown Donor'}</h4>
+                                                    <span className="bg-medical-primary/10 text-medical-primary text-xs px-2 py-0.5 rounded font-bold">
+                                                        {pledge.donorProfile?.bloodGroup}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-500 flex items-center gap-1"><Phone size={14} /> {pledge.donorId?.phone || 'No phone'}</p>
                                                 <p className="text-xs text-gray-400 mt-1">Pledged: {new Date(pledge.createdAt).toLocaleDateString()}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${pledge.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                    pledge.status === 'CONFIRMED' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100'
+                                                pledge.status === 'CONFIRMED' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100'
                                                 }`}>
                                                 {pledge.status}
                                             </span>

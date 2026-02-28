@@ -74,6 +74,14 @@ exports.pledgeToDonate = async (req, res) => {
         });
 
         await pledge.save();
+
+        // Update request status to PARTIAL if it's currently OPEN
+        const request = await BloodRequest.findById(requestId);
+        if (request && request.status === 'OPEN') {
+            request.status = 'PARTIAL';
+            await request.save();
+        }
+
         res.status(201).json(pledge);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
