@@ -59,9 +59,17 @@ exports.createRequest = async (req, res) => {
 
 exports.getHospitalRequests = async (req, res) => {
     try {
-        const requests = await BloodRequest.find({ hospitalId: req.user.id }).sort({ createdAt: -1 });
-        res.json(requests);
+        const requests = await BloodRequest.find({ hospitalId: req.user.id }).sort({ createdAt: -1 }).lean();
+
+        // Fetch pledge counts for each request
+        const requestsWithCounts = await Promise.all(requests.map(async (request) => {
+            const pledgeCount = await Pledge.countDocuments({ requestId: request._id });
+            return { ...request, pledgeCount };
+        }));
+
+        res.json(requestsWithCounts);
     } catch (err) {
+        console.error('getHospitalRequests Error:', err);
         res.status(500).json({ message: 'Server error' });
     }
 };

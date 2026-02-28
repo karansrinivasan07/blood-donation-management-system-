@@ -20,7 +20,9 @@ const Dashboard = () => {
 
             const active = data.filter(r => r.status === 'OPEN' || r.status === 'PARTIAL').length;
             const fulfilled = data.filter(r => r.status === 'CLOSED').length;
-            setMetrics({ active, fulfilled, totalPledges: 0 }); // Placeholder for pledges count
+            const totalPledges = data.reduce((sum, r) => sum + (r.pledgeCount || 0), 0);
+
+            setMetrics({ active, fulfilled, totalPledges });
         } catch (err) {
             toast.error('Failed to load requests');
         } finally {
@@ -77,8 +79,11 @@ const Dashboard = () => {
 
                                     <div className="flex items-center gap-6">
                                         <div className="text-right">
+                                            <div className="flex items-center justify-end gap-2 text-medical-secondary font-bold text-sm mb-1">
+                                                <Users size={16} /> {request.pledgeCount || 0} Donors
+                                            </div>
                                             <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${request.status === 'OPEN' ? 'bg-green-100 text-green-700' :
-                                                    request.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
+                                                request.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
                                                 }`}>
                                                 {request.status}
                                             </span>
