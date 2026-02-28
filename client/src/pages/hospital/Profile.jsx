@@ -124,38 +124,7 @@ const Profile = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">City</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                if (navigator.geolocation) {
-                                                    toast.loading('Pinpointing camp location...', { id: 'camp-geo' });
-                                                    navigator.geolocation.getCurrentPosition(async (position) => {
-                                                        const { latitude, longitude } = position.coords;
-                                                        try {
-                                                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                                                            const data = await res.json();
-                                                            const city = data.address.city || data.address.town || data.address.village || '';
-                                                            const pincode = data.address.postcode || '';
-                                                            setFormData(prev => ({
-                                                                ...prev,
-                                                                city,
-                                                                pincode,
-                                                                location: { lat: latitude, lng: longitude }
-                                                            }));
-                                                            toast.success('Exact coordinates pinned!', { id: 'camp-geo' });
-                                                        } catch (err) {
-                                                            toast.error('Could not fetch address', { id: 'camp-geo' });
-                                                        }
-                                                    }, () => toast.error('Location denied', { id: 'camp-geo' }), { enableHighAccuracy: true });
-                                                }
-                                            }}
-                                            className="text-[10px] text-medical-secondary font-black uppercase tracking-tighter hover:underline flex items-center gap-1"
-                                        >
-                                            <MapPin size={10} /> Pin Exact GPS
-                                        </button>
-                                    </div>
+                                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">City</label>
                                     <div className="input-group">
                                         <MapPin size={18} />
                                         <input
@@ -179,6 +148,137 @@ const Profile = () => {
                                             value={formData.pincode}
                                             onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                                         />
+                                    </div>
+                                </div>
+
+                                {/* Geolocation Section */}
+                                <div className="md:col-span-2 space-y-4 pt-4 border-t border-gray-100">
+                                    <div className="flex justify-between items-center px-1">
+                                        <div>
+                                            <h3 className="font-bold text-gray-800 uppercase tracking-tight flex items-center gap-2">
+                                                <MapPin className="text-medical-secondary" size={18} /> Camp Geolocation
+                                            </h3>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pin exact coordinates for the location QR</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (navigator.geolocation) {
+                                                    toast.loading('Pinpointing your current site...', { id: 'camp-geo' });
+                                                    navigator.geolocation.getCurrentPosition(async (position) => {
+                                                        const { latitude, longitude } = position.coords;
+                                                        try {
+                                                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                                                            const data = await res.json();
+                                                            const city = data.address.city || data.address.town || data.address.village || '';
+                                                            const pincode = data.address.postcode || '';
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                city,
+                                                                pincode,
+                                                                location: { lat: latitude, lng: longitude }
+                                                            }));
+                                                            toast.success('Current site pinned!', { id: 'camp-geo' });
+                                                        } catch (err) {
+                                                            toast.error('Fetched coordinates, but address search failed', { id: 'camp-geo' });
+                                                            setFormData(p => ({ ...p, location: { lat: latitude, lng: longitude } }));
+                                                        }
+                                                    }, () => toast.error('Camera/Location access denied', { id: 'camp-geo' }), { enableHighAccuracy: true });
+                                                }
+                                            }}
+                                            className="btn-secondary py-2 px-4 text-xs font-black flex items-center gap-2 shadow-none"
+                                        >
+                                            <Activity size={14} /> Pin My Current Site
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-4">
+                                            <div className="space-y-1">
+                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Site by Address</label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        id="site-search"
+                                                        className="input-field py-2 flex-1"
+                                                        placeholder="e.g. City Mall, NY"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={async () => {
+                                                            const query = document.getElementById('site-search').value;
+                                                            if (!query) return;
+                                                            toast.loading('Searching address...', { id: 'search-geo' });
+                                                            try {
+                                                                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+                                                                const results = await res.json();
+                                                                if (results.length > 0) {
+                                                                    const { lat, lon } = results[0];
+                                                                    setFormData(p => ({ ...p, location: { lat: parseFloat(lat), lng: parseFloat(lon) } }));
+                                                                    toast.success('Location found!', { id: 'search-geo' });
+                                                                } else {
+                                                                    toast.error('No results found', { id: 'search-geo' });
+                                                                }
+                                                            } catch (err) {
+                                                                toast.error('Search failed', { id: 'search-geo' });
+                                                            }
+                                                        }}
+                                                        className="bg-medical-secondary text-white px-4 rounded-xl hover:bg-medical-secondary/90 transition-all font-bold text-xs"
+                                                    >
+                                                        Search
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-black text-gray-400 uppercase">Latitude</label>
+                                                    <input
+                                                        type="number"
+                                                        step="any"
+                                                        className="input-field py-2"
+                                                        placeholder="e.g. 40.7128"
+                                                        value={formData.location.lat || ''}
+                                                        onChange={(e) => setFormData(p => ({ ...p, location: { ...p.location, lat: parseFloat(e.target.value) } }))}
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] font-black text-gray-400 uppercase">Longitude</label>
+                                                    <input
+                                                        type="number"
+                                                        step="any"
+                                                        className="input-field py-2"
+                                                        placeholder="e.g. -74.0060"
+                                                        value={formData.location.lng || ''}
+                                                        onChange={(e) => setFormData(p => ({ ...p, location: { ...p.location, lng: parseFloat(e.target.value) } }))}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100/50">
+                                                <p className="text-[11px] text-blue-700 leading-relaxed italic">
+                                                    Donors scanning your QR will navigate to these exact coordinates. You can pin your current location or search for the address.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="h-full min-h-[200px] bg-gray-100 rounded-2xl border-4 border-white shadow-inner overflow-hidden relative">
+                                            {formData.location.lat && formData.location.lng ? (
+                                                <iframe
+                                                    title="Camp Preview"
+                                                    width="100%"
+                                                    height="100%"
+                                                    frameBorder="0"
+                                                    scrolling="no"
+                                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${formData.location.lng - 0.003},${formData.location.lat - 0.003},${formData.location.lng + 0.003},${formData.location.lat + 0.003}&layer=mapnik&marker=${formData.location.lat},${formData.location.lng}`}
+                                                ></iframe>
+                                            ) : (
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 text-center p-6">
+                                                    <MapPin size={32} className="mb-2 opacity-20" />
+                                                    <p className="text-xs font-bold uppercase tracking-tighter">No Location Pinned</p>
+                                                    <p className="text-[10px] mt-1">Pin your GPS to see map preview</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
