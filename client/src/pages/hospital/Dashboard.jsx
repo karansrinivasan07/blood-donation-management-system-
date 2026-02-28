@@ -60,6 +60,8 @@ const Dashboard = () => {
                 <QRScanner
                     onScan={handleScan}
                     onClose={() => setIsScannerOpen(false)}
+                    title="Scan Donor Location"
+                    label="Scan the donor's QR code to see their location and details."
                 />
             )}
 

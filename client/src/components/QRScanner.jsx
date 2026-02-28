@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { X, QrCode } from 'lucide-react';
 
-const QRScanner = ({ onScan, onClose }) => {
+const QRScanner = ({ onScan, onClose, title = "Scan QR Code", label = "Place the QR code within the square to scan." }) => {
     useEffect(() => {
         const scanner = new Html5QrcodeScanner('reader', {
             fps: 10,
@@ -33,7 +33,7 @@ const QRScanner = ({ onScan, onClose }) => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-medical-secondary text-white">
                     <div className="flex items-center gap-2">
                         <QrCode size={24} />
-                        <h2 className="text-xl font-bold">Scan Donor QR</h2>
+                        <h2 className="text-xl font-bold">{title}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -46,7 +46,7 @@ const QRScanner = ({ onScan, onClose }) => {
                 <div className="p-6">
                     <div id="reader" className="overflow-hidden rounded-2xl border-none"></div>
                     <p className="mt-4 text-center text-gray-500 text-sm">
-                        Place the donor's QR code within the square to scan their location.
+                        {label}
                     </p>
                 </div>
             </div>

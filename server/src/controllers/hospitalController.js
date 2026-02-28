@@ -14,7 +14,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { hospitalName, address, city, pincode } = req.body;
+        const { hospitalName, address, city, pincode, location } = req.body;
         let profile = await HospitalProfile.findOne({ userId: req.user.id });
 
         if (!profile) {
@@ -25,6 +25,7 @@ exports.updateProfile = async (req, res) => {
         profile.address = address || profile.address;
         profile.city = city || profile.city;
         profile.pincode = pincode || profile.pincode;
+        profile.location = location || profile.location;
 
         await profile.save();
         res.json(profile);

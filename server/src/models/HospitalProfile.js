@@ -5,7 +5,11 @@ const hospitalProfileSchema = new mongoose.Schema({
     hospitalName: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
-    pincode: { type: String, required: true }
+    pincode: { type: String, required: true },
+    location: {
+        lat: { type: Number },
+        lng: { type: Number }
+    }
 });
 
 module.exports = mongoose.model('HospitalProfile', hospitalProfileSchema);

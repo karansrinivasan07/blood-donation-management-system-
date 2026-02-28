@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { Search, MapPin, Droplets, Clock, ChevronRight, HeartPulse, Activity } from 'lucide-react';
+import { Search, MapPin, Droplets, Clock, ChevronRight, HeartPulse, Activity, QrCode, Plus, Building2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
     const { profile } = useAuth();
@@ -10,6 +12,8 @@ const Dashboard = () => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [scanResult, setScanResult] = useState(null);
 
     useEffect(() => {
         fetchRequests();
@@ -37,8 +41,82 @@ const Dashboard = () => {
         }
     };
 
+    const handleScan = (decodedText) => {
+        setIsScannerOpen(false);
+        try {
+            const data = JSON.parse(decodedText);
+            if (data.type === 'BLOOD_CAMP') {
+                setScanResult(data);
+                toast.success('Donation Camp Found!');
+            } else {
+                toast.error('Not a valid Camp QR Code');
+            }
+        } catch (err) {
+            toast.error('Invalid QR Code');
+        }
+    };
+
     return (
         <div className="space-y-8">
+            {isScannerOpen && (
+                <QRScanner
+                    onScan={handleScan}
+                    onClose={() => setIsScannerOpen(false)}
+                    title="Scan Donation Camp"
+                    label="Scan a hospital's camp QR to see their location and details."
+                />
+            )}
+
+            {scanResult && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-100 bg-medical-secondary text-white flex justify-between items-center">
+                            <h2 className="text-xl font-bold">Donation Camp Details</h2>
+                            <button onClick={() => setScanResult(null)}><Plus className="rotate-45" /></button>
+                        </div>
+                        <div className="p-8 space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 bg-medical-secondary/10 rounded-2xl flex items-center justify-center text-medical-secondary text-2xl">
+                                    <Building2 size={32} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-800">{scanResult.name}</h3>
+                                    <p className="text-gray-500 text-sm">{scanResult.address}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
+                                {scanResult.location?.lat ? (
+                                    <div className="h-48 w-full relative">
+                                        <iframe
+                                            title="Camp Location"
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${scanResult.location.lng - 0.005},${scanResult.location.lat - 0.005},${scanResult.location.lng + 0.005},${scanResult.location.lat + 0.005}&layer=mapnik&marker=${scanResult.location.lat},${scanResult.location.lng}`}
+                                        ></iframe>
+                                    </div>
+                                ) : (
+                                    <div className="h-48 flex items-center justify-center text-gray-400 italic text-sm p-4 text-center">
+                                        Location pinpoint not available. Search in {scanResult.city}.
+                                    </div>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    window.open(scanResult.mapsUrl, '_blank');
+                                    setScanResult(null);
+                                }}
+                                className="btn-secondary w-full py-4 flex items-center justify-center gap-2 text-lg font-bold"
+                            >
+                                <MapPin size={20} /> Navigate to Camp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* HERO SECTION */}
             <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden shadow-2xl group">
                 <img
@@ -94,7 +172,13 @@ const Dashboard = () => {
                     <p className="text-gray-500">Available requests in {filters.city || 'all cities'}</p>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 items-center">
+                    <button
+                        onClick={() => setIsScannerOpen(true)}
+                        className="btn-secondary flex items-center gap-2 h-fit py-2.5"
+                    >
+                        <QrCode size={20} /> Scan Camp QR
+                    </button>
                     <div className="input-group">
                         <Search size={18} />
                         <input
