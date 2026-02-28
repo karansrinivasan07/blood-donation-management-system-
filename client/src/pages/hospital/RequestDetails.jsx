@@ -238,17 +238,11 @@ const RequestDetails = () => {
                                 <div className="space-y-2">
                                     <div className="bg-white p-3 rounded-2xl shadow-lg border border-gray-100 w-fit mx-auto" id={`qr-${selectedPledge._id}`}>
                                         <QRCodeSVG
-                                            value={JSON.stringify({
-                                                type: 'BLOOD_DONOR',
-                                                name: selectedPledge.donorId?.name,
-                                                bloodGroup: selectedPledge.donorProfile?.bloodGroup,
-                                                city: selectedPledge.donorProfile?.city,
-                                                location: selectedPledge.donorProfile?.location,
-                                                pledgeId: selectedPledge._id,
-                                                mapsUrl: selectedPledge.donorProfile?.location?.lat
-                                                    ? `https://www.google.com/maps?q=${selectedPledge.donorProfile.location.lat},${selectedPledge.donorProfile.location.lng}`
+                                            value={
+                                                selectedPledge.donorProfile?.location?.lat
+                                                    ? `https://www.google.com/maps/search/?api=1&query=${selectedPledge.donorProfile.location.lat},${selectedPledge.donorProfile.location.lng}`
                                                     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPledge.donorProfile?.city || '')}`
-                                            })}
+                                            }
                                             size={160}
                                             level="H"
                                         />

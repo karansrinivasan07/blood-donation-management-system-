@@ -116,18 +116,11 @@ const MyPledges = () => {
                                     <div className="flex flex-col items-center gap-2 pl-6 border-l border-gray-100">
                                         <div className="bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm" id={`qr-${pledge._id}`}>
                                             <QRCodeSVG
-                                                value={JSON.stringify({
-                                                    type: 'BLOOD_DONOR',
-                                                    name: user?.name,
-                                                    bloodGroup: profile?.bloodGroup,
-                                                    city: profile?.city,
-                                                    location: profile?.location,
-                                                    pledgeId: pledge._id,
-                                                    requestId: pledge.requestId?._id,
-                                                    mapsUrl: profile?.location?.lat
-                                                        ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
+                                                value={
+                                                    profile?.location?.lat
+                                                        ? `https://www.google.com/maps/search/?api=1&query=${profile.location.lat},${profile.location.lng}`
                                                         : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.city + ' ' + (profile?.pincode || ''))}`
-                                                })}
+                                                }
                                                 size={80}
                                                 level="H"
                                             />

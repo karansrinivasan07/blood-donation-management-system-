@@ -190,19 +190,11 @@ const Dashboard = () => {
                     <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-3 border-t-4 border-medical-secondary h-full">
                         <div className="bg-white p-2 rounded-2xl shadow-md border border-gray-50 mb-1" id="camp-qr-dash">
                             <QRCodeSVG
-                                value={JSON.stringify({
-                                    type: 'BLOOD_CAMP',
-                                    name: profile?.hospitalName,
-                                    address: profile?.address,
-                                    city: profile?.city,
-                                    email: profile?.contactEmail,
-                                    phone: profile?.contactPhone,
-                                    isActive: profile?.isCampActive,
-                                    location: profile?.location,
-                                    mapsUrl: profile?.location?.lat
-                                        ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
-                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.hospitalName + ' ' + (profile?.city || ''))}`
-                                })}
+                                value={
+                                    profile?.location?.lat
+                                        ? `https://www.google.com/maps/search/?api=1&query=${profile.location.lat},${profile.location.lng}`
+                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
+                                }
                                 size={120}
                                 level="H"
                             />

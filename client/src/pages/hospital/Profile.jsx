@@ -201,16 +201,25 @@ const Profile = () => {
                                             </div>
                                         </div>
 
-                                        <div className="h-full min-h-[200px] bg-gray-100 rounded-2xl border-4 border-white shadow-inner overflow-hidden relative">
+                                        <div className="h-full min-h-[200px] bg-gray-100 rounded-2xl border-4 border-white shadow-inner overflow-hidden relative group">
                                             {formData.location.lat && formData.location.lng ? (
-                                                <iframe
-                                                    title="Camp Preview"
-                                                    width="100%"
-                                                    height="100%"
-                                                    frameBorder="0"
-                                                    scrolling="no"
-                                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${formData.location.lng - 0.003},${formData.location.lat - 0.003},${formData.location.lng + 0.003},${formData.location.lat + 0.003}&layer=mapnik&marker=${formData.location.lat},${formData.location.lng}`}
-                                                ></iframe>
+                                                <>
+                                                    <iframe
+                                                        title="Camp Preview"
+                                                        width="100%"
+                                                        height="100%"
+                                                        frameBorder="0"
+                                                        scrolling="no"
+                                                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${formData.location.lng - 0.003},${formData.location.lat - 0.003},${formData.location.lng + 0.003},${formData.location.lat + 0.003}&layer=mapnik&marker=${formData.location.lat},${formData.location.lng}`}
+                                                    ></iframe>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${formData.location.lat},${formData.location.lng}`, '_blank')}
+                                                        className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-medical-secondary p-2 rounded-lg shadow-lg hover:bg-white transition-all opacity-0 group-hover:opacity-100 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                                                    >
+                                                        <Activity size={12} /> Test Navigation
+                                                    </button>
+                                                </>
                                             ) : (
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 text-center p-6">
                                                     <MapPin size={32} className="mb-2 opacity-20" />
@@ -254,19 +263,11 @@ const Profile = () => {
                     <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-4 border-t-4 border-medical-secondary">
                         <div className="bg-white p-3 rounded-3xl shadow-md border border-gray-100" id="camp-qr">
                             <QRCodeSVG
-                                value={JSON.stringify({
-                                    type: 'BLOOD_CAMP',
-                                    name: profile?.hospitalName,
-                                    address: profile?.address,
-                                    city: profile?.city,
-                                    email: profile?.contactEmail,
-                                    phone: profile?.contactPhone,
-                                    isActive: profile?.isCampActive,
-                                    location: profile?.location,
-                                    mapsUrl: profile?.location?.lat
-                                        ? `https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`
-                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile?.hospitalName + ' ' + (profile?.city || ''))}`
-                                })}
+                                value={
+                                    profile?.location?.lat
+                                        ? `https://www.google.com/maps/search/?api=1&query=${profile.location.lat},${profile.location.lng}`
+                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
+                                }
                                 size={180}
                                 level="H"
                                 includeMargin={true}
