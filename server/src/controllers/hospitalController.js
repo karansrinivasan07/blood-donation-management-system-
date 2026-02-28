@@ -111,6 +111,7 @@ exports.updatePledgeStatus = async (req, res) => {
         pledge.appointmentTime = appointmentTime || pledge.appointmentTime;
 
         if (status === 'COMPLETED') {
+            pledge.completedAt = new Date();
             const donorProfile = await DonorProfile.findOne({ userId: pledge.donorId });
             if (donorProfile) {
                 donorProfile.lastDonationDate = new Date();

@@ -71,15 +71,22 @@ const MyPledges = () => {
                             </div>
 
                             <div className="flex items-center gap-4">
-                                {pledge.appointmentTime && (
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-xs text-gray-400 font-medium">Appointment</p>
-                                        <p className="font-semibold">{new Date(pledge.appointmentTime).toLocaleString()}</p>
+                                <div className="flex flex-col items-end gap-2">
+                                    {pledge.status === 'COMPLETED' && pledge.completedAt ? (
+                                        <div className="text-right">
+                                            <p className="text-xs text-green-500 font-bold uppercase tracking-wider">Donated On</p>
+                                            <p className="font-bold text-gray-800">{new Date(pledge.completedAt).toLocaleString()}</p>
+                                        </div>
+                                    ) : pledge.appointmentTime ? (
+                                        <div className="text-right">
+                                            <p className="text-xs text-medical-secondary font-medium">Appointment</p>
+                                            <p className="font-semibold text-gray-700">{new Date(pledge.appointmentTime).toLocaleString()}</p>
+                                        </div>
+                                    ) : null}
+                                    <div className={`px-4 py-2 rounded-full border flex items-center gap-2 font-semibold text-sm ${getStatusStyle(pledge.status)}`}>
+                                        {getStatusIcon(pledge.status)}
+                                        {pledge.status}
                                     </div>
-                                )}
-                                <div className={`px-4 py-2 rounded-full border flex items-center gap-2 font-semibold text-sm ${getStatusStyle(pledge.status)}`}>
-                                    {getStatusIcon(pledge.status)}
-                                    {pledge.status}
                                 </div>
                             </div>
                         </div>

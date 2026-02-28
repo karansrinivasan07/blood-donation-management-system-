@@ -6,6 +6,7 @@ const pledgeSchema = new mongoose.Schema({
     donorProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'DonorProfile' },
     status: { type: String, enum: ['PLEDGED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'], default: 'PLEDGED' },
     appointmentTime: { type: Date },
+    completedAt: { type: Date },
     createdAt: { type: Date, default: Date.now }
 });
 

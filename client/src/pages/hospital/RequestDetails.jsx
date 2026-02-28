@@ -127,9 +127,14 @@ const RequestDetails = () => {
                                                 }`}>
                                                 {pledge.status}
                                             </span>
-                                            {pledge.appointmentTime && (
+                                            {pledge.appointmentTime && pledge.status !== 'COMPLETED' && (
                                                 <p className="text-xs text-medical-secondary font-medium mt-2">
                                                     Appt: {new Date(pledge.appointmentTime).toLocaleString()}
+                                                </p>
+                                            )}
+                                            {pledge.status === 'COMPLETED' && pledge.completedAt && (
+                                                <p className="text-xs text-green-600 font-bold mt-2 flex items-center justify-end gap-1">
+                                                    <CheckCircle2 size={12} /> Donated: {new Date(pledge.completedAt).toLocaleString()}
                                                 </p>
                                             )}
                                         </div>
