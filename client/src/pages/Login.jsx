@@ -23,7 +23,9 @@ const Login = () => {
             else if (user.role === 'HOSPITAL') navigate('/hospital/dashboard');
             else if (user.role === 'ADMIN') navigate('/admin/analytics');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Login failed');
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Login failed';
+            toast.error(errorMsg);
+            console.error('Detailed Login Error:', err.response?.data);
         } finally {
             setLoading(false);
         }

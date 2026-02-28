@@ -102,6 +102,14 @@ exports.login = async (req, res) => {
             role: user.role
         };
 
+        if (!process.env.JWT_SECRET) {
+            console.error('SERVER ERROR: JWT_SECRET environment variable is missing');
+            return res.status(500).json({
+                message: 'Server configuration error',
+                error: 'JWT_SECRET is missing'
+            });
+        }
+
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.json({
@@ -114,8 +122,12 @@ exports.login = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error('LOGIN ERROR FULL:', err);
+        res.status(500).json({
+            message: 'Login failed at server',
+            error: err.message,
+            name: err.name
+        });
     }
 };
 
@@ -132,7 +144,10 @@ exports.me = async (req, res) => {
 
         res.json({ user, profile });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error('ME ROUTE ERROR:', err);
+        res.status(500).json({
+            message: 'Failed to fetch user profile',
+            error: err.message
+        });
     }
 };
