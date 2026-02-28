@@ -52,7 +52,13 @@ const Dashboard = () => {
                 toast.error('Not a valid Camp QR Code');
             }
         } catch (err) {
-            toast.error('Invalid QR Code');
+            // Fallback for simple map URLs
+            if (decodedText.startsWith('https://www.google.com/maps')) {
+                window.open(decodedText, '_blank');
+                toast.success('Opening camp location in Maps...');
+            } else {
+                toast.error('Invalid QR Code');
+            }
         }
     };
 

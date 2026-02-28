@@ -61,3 +61,17 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-medical-primary/30 rounded-full hover:bg-medical-primary/50 transition-all;
 }
+
+@keyframes scan-line {
+  0% {
+    top: 0%
+  }
+
+  100% {
+    top: 100%
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 2s linear infinite;
+}
