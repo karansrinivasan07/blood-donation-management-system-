@@ -24,7 +24,30 @@ require('./models/Pledge');
 // Middleware
 const app = express();
 
-// Database connection check middleware
+// Simple and robust CORS config for Vercel
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://flashsaver.vercel.app',
+    process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+app.use(morgan('dev'));
+
+// Database connection check middleware (MUST be after CORS so error responses have headers)
 app.use((req, res, next) => {
     if (mongoose.connection.readyState !== 1) {
         return res.status(503).json({
@@ -34,30 +57,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-
-        const allowedOrigins = [
-            'http://localhost:5173',
-            'https://flashsaver.vercel.app',
-            process.env.CLIENT_URL
-        ].filter(Boolean);
-
-        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-};
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', authRoutes);
