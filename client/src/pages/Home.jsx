@@ -34,10 +34,10 @@ const Home = () => {
                 </div>
 
                 <div className="flex-1 relative">
-                    <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500 bg-white">
                         <img
-                            src="https://images.unsplash.com/photo-1615461066841-60a63788b202?auto=format&fit=crop&q=80&w=800"
-                            alt="Blood Donation"
+                            src="/assets/superhero_banner.png"
+                            alt="Superhero Blood Donation"
                             className="w-full h-auto"
                         />
                     </div>

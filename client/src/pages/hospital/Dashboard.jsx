@@ -32,6 +32,18 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8">
+            <div className="relative h-48 rounded-3xl overflow-hidden shadow-lg p-8 flex items-center bg-medical-dark text-white mb-6">
+                <div className="z-10 relative">
+                    <h1 className="text-3xl font-black mb-1">Empowering Healthcare</h1>
+                    <p className="text-gray-400">Manage your blood requests and find local heroes in our community.</p>
+                </div>
+                <img
+                    src="/assets/superhero_banner.png"
+                    className="absolute right-0 top-0 h-full w-2/3 object-cover opacity-30 mix-blend-screen"
+                    style={{ maskImage: 'linear-gradient(to left, white, transparent)' }}
+                />
+            </div>
+
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold">Hospital Dashboard</h1>

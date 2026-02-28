@@ -27,6 +27,25 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8">
+            {/* HERO SECTION */}
+            <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden shadow-2xl group">
+                <img
+                    src="/assets/superhero_banner.png"
+                    alt="Superhero Donor"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center px-10 md:px-16">
+                    <h1 className="text-4xl md:text-6xl font-black text-white mb-4 drop-shadow-lg tracking-tight">
+                        Be <span className="text-medical-primary">Someone's</span> <br />
+                        <span className="uppercase tracking-widest text-white/90">Superhero</span>
+                    </h1>
+                    <p className="text-white/80 text-lg md:text-xl font-medium max-w-md">
+                        Your small donation is a giant leap for someone else's life.
+                        Join 2,000+ heroes today.
+                    </p>
+                </div>
+            </div>
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">Find Blood Requests</h1>
