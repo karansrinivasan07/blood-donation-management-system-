@@ -76,11 +76,25 @@ exports.getHospitalRequests = async (req, res) => {
 
 exports.getRequestPledges = async (req, res) => {
     try {
-        const pledges = await Pledge.find({ requestId: req.params.id })
+        const requestId = req.params.id;
+
+        // Verify hospital owns this request
+        const request = await BloodRequest.findById(requestId);
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+
+        if (request.hospitalId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized access to this request' });
+        }
+
+        const pledges = await Pledge.find({ requestId })
             .populate('donorId', 'name email phone')
-            .populate('donorProfile');
+            .populate('donorProfile')
+            .sort({ createdAt: -1 });
+
+        console.log(`Found ${pledges.length} pledges for request ${requestId}`);
         res.json(pledges);
     } catch (err) {
+        console.error('getRequestPledges Error:', err);
         res.status(500).json({ message: 'Server error' });
     }
 };

@@ -54,6 +54,11 @@ exports.pledgeToDonate = async (req, res) => {
 
         // Check donor eligibility (90 days)
         const profile = await DonorProfile.findOne({ userId: donorId });
+        if (!profile) {
+            console.error(`Pledge Fail: No donor profile for user ${donorId}`);
+            return res.status(400).json({ message: 'Donor profile is incomplete. Please update your profile first.' });
+        }
+
         if (profile.lastDonationDate) {
             const ninetyDaysInMs = 90 * 24 * 60 * 60 * 1000;
             if (Date.now() - new Date(profile.lastDonationDate).getTime() < ninetyDaysInMs) {
@@ -67,6 +72,7 @@ exports.pledgeToDonate = async (req, res) => {
             return res.status(400).json({ message: 'You have already pledged for this request' });
         }
 
+        console.log(`Creating pledge for Request: ${requestId} by Donor: ${donorId}`);
         const pledge = new Pledge({
             requestId,
             donorId,
@@ -82,8 +88,10 @@ exports.pledgeToDonate = async (req, res) => {
             await request.save();
         }
 
+        console.log('Pledge saved successfully');
         res.status(201).json(pledge);
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('Pledge Error:', err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
