@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
@@ -10,12 +11,29 @@ const hospitalRoutes = require('./routes/hospitalRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
 
-const app = express();
-
 // Connect to Database
 connectDB();
 
+// Register Models for global access (fixes population issues)
+require('./models/User');
+require('./models/DonorProfile');
+require('./models/HospitalProfile');
+require('./models/BloodRequest');
+require('./models/Pledge');
+
 // Middleware
+const app = express();
+
+// Database connection check middleware
+app.use((req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            message: 'Database connection is still establishing',
+            error: 'Mongoose connection state: ' + mongoose.connection.readyState
+        });
+    }
+    next();
+});
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl)

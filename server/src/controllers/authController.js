@@ -83,6 +83,10 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -134,8 +138,11 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-passwordHash');
-        let profile = null;
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
+        let profile = null;
         if (user.role === 'DONOR') {
             profile = await DonorProfile.findOne({ userId: user._id });
         } else if (user.role === 'HOSPITAL') {
