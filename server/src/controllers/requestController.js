@@ -1,4 +1,6 @@
 const BloodRequest = require('../models/BloodRequest');
+const HospitalProfile = require('../models/HospitalProfile'); // Required for populate
+const Pledge = require('../models/Pledge'); // Required for counts
 
 exports.getAllRequests = async (req, res) => {
     try {
@@ -22,7 +24,11 @@ exports.getAllRequests = async (req, res) => {
 
         res.json(requests);
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('getAllRequests Error:', err);
+        res.status(500).json({
+            message: 'Server error',
+            error: err.message
+        });
     }
 };
 
@@ -32,6 +38,10 @@ exports.getRequestById = async (req, res) => {
         if (!request) return res.status(404).json({ message: 'Request not found' });
         res.json(request);
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('getRequestById Error:', err);
+        res.status(500).json({
+            message: 'Server error',
+            error: err.message
+        });
     }
 };

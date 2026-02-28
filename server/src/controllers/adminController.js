@@ -2,6 +2,7 @@ const User = require('../models/User');
 const BloodRequest = require('../models/BloodRequest');
 const DonorProfile = require('../models/DonorProfile');
 const Pledge = require('../models/Pledge');
+const HospitalProfile = require('../models/HospitalProfile');
 
 exports.getUsers = async (req, res) => {
     try {

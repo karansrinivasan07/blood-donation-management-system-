@@ -71,7 +71,10 @@ exports.getHospitalRequests = async (req, res) => {
         res.json(requestsWithCounts);
     } catch (err) {
         console.error('getHospitalRequests Error:', err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({
+            message: 'Server error',
+            error: err.message
+        });
     }
 };
 
