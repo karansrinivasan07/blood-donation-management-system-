@@ -88,8 +88,9 @@ const Profile = () => {
                                     type="button"
                                     onClick={() => {
                                         if (navigator.geolocation) {
+                                            toast.loading('Pinpointing exact location...', { id: 'geo' });
                                             navigator.geolocation.getCurrentPosition(async (position) => {
-                                                const { latitude, longitude } = position.coords;
+                                                const { latitude, longitude, accuracy } = position.coords;
                                                 try {
                                                     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                                                     const data = await res.json();
@@ -99,12 +100,18 @@ const Profile = () => {
                                                         ...prev,
                                                         city,
                                                         pincode,
-                                                        location: { lat: latitude, lng: longitude }
+                                                        location: { lat: latitude, lng: longitude, accuracy }
                                                     }));
-                                                    toast.success('Location updated!');
+                                                    toast.success(`Exact location pinned! (Accuracy: ${Math.round(accuracy)}m)`, { id: 'geo' });
                                                 } catch (err) {
-                                                    toast.error('Could not fetch city name');
+                                                    toast.error('Could not fetch city name', { id: 'geo' });
                                                 }
+                                            }, (err) => {
+                                                toast.error('Location access denied', { id: 'geo' });
+                                            }, {
+                                                enableHighAccuracy: true,
+                                                timeout: 10000,
+                                                maximumAge: 0
                                             });
                                         }
                                     }}

@@ -81,11 +81,34 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Coordinates</p>
-                                <p className="text-sm font-mono text-gray-600">
-                                    {scanResult.location?.lat ? `${scanResult.location.lat.toFixed(4)}, ${scanResult.location.lng.toFixed(4)}` : 'City Center'}
-                                </p>
+                            <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
+                                {scanResult.location?.lat ? (
+                                    <div className="h-48 w-full relative">
+                                        <iframe
+                                            title="Donor Location"
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            marginHeight="0"
+                                            marginWidth="0"
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${scanResult.location.lng - 0.005},${scanResult.location.lat - 0.005},${scanResult.location.lng + 0.005},${scanResult.location.lat + 0.005}&layer=mapnik&marker=${scanResult.location.lat},${scanResult.location.lng}`}
+                                        ></iframe>
+                                        <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-medical-primary shadow-sm border border-medical-primary/20">
+                                            High Precision GPS
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-48 flex items-center justify-center text-gray-400 italic text-sm p-4 text-center">
+                                        Exact coordinates not provided. Using city center.
+                                    </div>
+                                )}
+                                <div className="p-4 border-t border-gray-100">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Coordinates</p>
+                                    <p className="text-sm font-mono text-gray-600">
+                                        {scanResult.location?.lat ? `${scanResult.location.lat.toFixed(6)}, ${scanResult.location.lng.toFixed(6)}` : 'City: ' + scanResult.city}
+                                    </p>
+                                </div>
                             </div>
 
                             <button
