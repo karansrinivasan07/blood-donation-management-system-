@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { User, Phone, CheckCircle2, XCircle, Calendar, Clock, ChevronLeft } from 'lucide-react';
+import { User, Phone, CheckCircle2, XCircle, Calendar, Clock, ChevronLeft, MapPin, QrCode, ExternalLink, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const RequestDetails = () => {
     const { id } = useParams();
@@ -10,10 +11,31 @@ const RequestDetails = () => {
     const [request, setRequest] = useState(null);
     const [pledges, setPledges] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedPledge, setSelectedPledge] = useState(null);
 
     useEffect(() => {
         fetchData();
     }, [id]);
+
+    const handleDownloadQR = (pledgeId, donorName) => {
+        const svg = document.querySelector(`#qr-${pledgeId} svg`);
+        if (!svg) return;
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const png = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `donor-qr-${donorName}.png`;
+            link.href = png;
+            link.click();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+    };
 
     const fetchData = async () => {
         try {
@@ -142,6 +164,23 @@ const RequestDetails = () => {
                                         </div>
                                     </div>
 
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        <button
+                                            onClick={() => setSelectedPledge(pledge)}
+                                            className="text-[10px] bg-red-50 text-medical-primary px-3 py-1.5 rounded-lg font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-red-100 transition-all border border-red-100"
+                                        >
+                                            <QrCode size={12} /> Show Donor QR & Location
+                                        </button>
+                                        {pledge.donorProfile?.location?.lat && (
+                                            <button
+                                                onClick={() => window.open(`https://www.google.com/maps?q=${pledge.donorProfile.location.lat},${pledge.donorProfile.location.lng}`, '_blank')}
+                                                className="text-[10px] bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-100 transition-all border border-blue-100"
+                                            >
+                                                <ExternalLink size={12} /> Open Maps
+                                            </button>
+                                        )}
+                                    </div>
+
                                     <div className="flex gap-3 pt-4 border-t border-gray-100">
                                         {pledge.status === 'PLEDGED' && (
                                             <button
@@ -178,6 +217,93 @@ const RequestDetails = () => {
                     )}
                 </div>
             </div>
+
+            {/* Donor Detail Modal */}
+            {selectedPledge && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-100 bg-medical-primary text-white flex justify-between items-center">
+                            <div>
+                                <h2 className="text-xl font-bold">{selectedPledge.donorId?.name}'s Location</h2>
+                                <p className="text-xs opacity-80 uppercase tracking-widest font-black">Donor verification & site details</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedPledge(null)}
+                                className="p-2 hover:bg-white/10 rounded-full transition-all"
+                            ><XCircle /></button>
+                        </div>
+
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <div className="bg-white p-3 rounded-2xl shadow-lg border border-gray-100 w-fit mx-auto" id={`qr-${selectedPledge._id}`}>
+                                        <QRCodeSVG
+                                            value={JSON.stringify({
+                                                type: 'BLOOD_DONOR',
+                                                name: selectedPledge.donorId?.name,
+                                                bloodGroup: selectedPledge.donorProfile?.bloodGroup,
+                                                city: selectedPledge.donorProfile?.city,
+                                                location: selectedPledge.donorProfile?.location,
+                                                pledgeId: selectedPledge._id,
+                                                mapsUrl: selectedPledge.donorProfile?.location?.lat
+                                                    ? `https://www.google.com/maps?q=${selectedPledge.donorProfile.location.lat},${selectedPledge.donorProfile.location.lng}`
+                                                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPledge.donorProfile?.city || '')}`
+                                            })}
+                                            size={160}
+                                            level="H"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => handleDownloadQR(selectedPledge._id, selectedPledge.donorId?.name)}
+                                        className="text-[10px] text-medical-primary font-black uppercase tracking-widest hover:underline flex items-center justify-center gap-1 w-full"
+                                    >
+                                        <Download size={12} /> Download Verified QR
+                                    </button>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="bg-gray-50 p-4 rounded-2xl">
+                                        <p className="text-[10px] text-gray-400 font-black uppercase mb-1">Contact Info</p>
+                                        <p className="font-bold text-gray-700 flex items-center gap-2"><Phone size={14} /> {selectedPledge.donorId?.phone}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl">
+                                        <p className="text-[10px] text-gray-400 font-black uppercase mb-1">Blood Group</p>
+                                        <p className="font-black text-2xl text-medical-secondary">{selectedPledge.donorProfile?.bloodGroup}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="h-[280px] bg-gray-100 rounded-3xl border-4 border-white shadow-inner overflow-hidden relative">
+                                    {selectedPledge.donorProfile?.location?.lat ? (
+                                        <iframe
+                                            title="Donor Location"
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${selectedPledge.donorProfile.location.lng - 0.003},${selectedPledge.donorProfile.location.lat - 0.003},${selectedPledge.donorProfile.location.lng + 0.003},${selectedPledge.donorProfile.location.lat + 0.003}&layer=mapnik&marker=${selectedPledge.donorProfile.location.lat},${selectedPledge.donorProfile.location.lng}`}
+                                        ></iframe>
+                                    ) : (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 text-center p-6 bg-gray-50">
+                                            <MapPin size={32} className="mb-2 opacity-20" />
+                                            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 italic">Approx: {selectedPledge.donorProfile?.city}</p>
+                                            <p className="text-[10px] mt-1 text-gray-300">Exact coordinates not pinned by donor</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => window.open(`https://www.google.com/maps?q=${selectedPledge.donorProfile?.location?.lat},${selectedPledge.donorProfile?.location?.lng}`, '_blank')}
+                                    disabled={!selectedPledge.donorProfile?.location?.lat}
+                                    className="btn-primary w-full py-3 flex items-center justify-center gap-2 font-bold text-sm disabled:opacity-50"
+                                >
+                                    <ExternalLink size={18} /> Get Navigation Directions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
