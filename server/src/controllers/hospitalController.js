@@ -65,7 +65,8 @@ exports.getHospitalRequests = async (req, res) => {
         // Fetch pledge counts for each request
         const requestsWithCounts = await Promise.all(requests.map(async (request) => {
             const pledgeCount = await Pledge.countDocuments({ requestId: request._id });
-            return { ...request, pledgeCount };
+            const completedCount = await Pledge.countDocuments({ requestId: request._id, status: 'COMPLETED' });
+            return { ...request, pledgeCount, completedCount };
         }));
 
         res.json(requestsWithCounts);

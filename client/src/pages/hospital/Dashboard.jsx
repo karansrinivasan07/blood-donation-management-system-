@@ -19,7 +19,7 @@ const Dashboard = () => {
             setRequests(data);
 
             const active = data.filter(r => r.status === 'OPEN' || r.status === 'PARTIAL').length;
-            const fulfilled = data.filter(r => r.status === 'CLOSED').length;
+            const fulfilled = data.reduce((sum, r) => sum + (r.completedCount || 0), 0);
             const totalPledges = data.reduce((sum, r) => sum + (r.pledgeCount || 0), 0);
 
             setMetrics({ active, fulfilled, totalPledges });
@@ -57,8 +57,8 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                     { icon: <Activity className="text-blue-600" />, label: "Active Requests", value: metrics.active, color: "bg-blue-50" },
-                    { icon: <Droplet className="text-green-600" />, label: "Fulfilled", value: metrics.fulfilled, color: "bg-green-50" },
-                    { icon: <Users className="text-orange-600" />, label: "Total Pledges", value: "Pending", color: "bg-orange-50" },
+                    { icon: <Droplet className="text-green-600" />, label: "Units Collected", value: metrics.fulfilled, color: "bg-green-50" },
+                    { icon: <Users className="text-orange-600" />, label: "Total Pledges", value: metrics.totalPledges, color: "bg-orange-50" },
                 ].map((stat, i) => (
                     <div key={i} className={`${stat.color} p-6 rounded-2xl flex items-center gap-4`}>
                         <div className="p-3 bg-white rounded-xl shadow-sm">{stat.icon}</div>
@@ -91,8 +91,13 @@ const Dashboard = () => {
 
                                     <div className="flex items-center gap-6">
                                         <div className="text-right">
-                                            <div className="flex items-center justify-end gap-2 text-medical-secondary font-bold text-sm mb-1">
-                                                <Users size={16} /> {request.pledgeCount || 0} Donors
+                                            <div className="flex flex-col items-end gap-1 mb-2">
+                                                <div className="flex items-center gap-2 text-medical-secondary font-bold text-sm">
+                                                    <Users size={16} /> {request.pledgeCount || 0} Pledges
+                                                </div>
+                                                <div className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                                                    {request.completedCount || 0} / {request.unitsRequired} Units Collected
+                                                </div>
                                             </div>
                                             <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${request.status === 'OPEN' ? 'bg-green-100 text-green-700' :
                                                 request.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
