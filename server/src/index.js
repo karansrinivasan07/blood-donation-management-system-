@@ -47,15 +47,20 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Database connection check middleware (MUST be after CORS so error responses have headers)
-app.use((req, res, next) => {
-    if (mongoose.connection.readyState !== 1) {
-        return res.status(503).json({
-            message: 'Database connection is still establishing',
-            error: 'Mongoose connection state: ' + mongoose.connection.readyState
+// Database connection check middleware (Ensures DB is ready before handling requests)
+app.use(async (req, res, next) => {
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            console.log('Database not ready, waiting for connection...');
+            await connectDB();
+        }
+        next();
+    } catch (err) {
+        res.status(503).json({
+            message: 'Database connection failed',
+            error: err.message
         });
     }
-    next();
 });
 
 // Routes
