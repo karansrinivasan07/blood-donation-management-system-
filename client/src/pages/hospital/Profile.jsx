@@ -15,6 +15,8 @@ const Profile = () => {
         contactEmail: profile?.contactEmail || user?.email || '',
         contactPhone: profile?.contactPhone || user?.phone || '',
         isCampActive: profile?.isCampActive ?? true,
+        campAddress: profile?.campAddress || '',
+        campCity: profile?.campCity || '',
         location: profile?.location || { lat: null, lng: null }
     });
     const [loading, setLoading] = useState(false);
@@ -29,6 +31,8 @@ const Profile = () => {
                 contactEmail: profile.contactEmail || user?.email || '',
                 contactPhone: profile.contactPhone || user?.phone || '',
                 isCampActive: profile.isCampActive ?? true,
+                campAddress: profile.campAddress || '',
+                campCity: profile.campCity || '',
                 location: profile.location || { lat: null, lng: null }
             });
         }
@@ -151,6 +155,39 @@ const Profile = () => {
                                     </div>
                                 </div>
 
+                                {/* Camp Location Override */}
+                                <div className="md:col-span-2 p-6 bg-teal-50/50 rounded-2xl border border-teal-100/50 space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Info className="text-teal-600" size={18} />
+                                        <h3 className="font-bold text-teal-800 uppercase tracking-tight">Temporary Camp Location (Optional)</h3>
+                                    </div>
+                                    <p className="text-[11px] text-teal-700 leading-relaxed italic">
+                                        If the camp is being held somewhere other than the main hospital building, enter the address below. This will be used for the QR Code if GPS is not pinned.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Camp Address / Venue</label>
+                                            <input
+                                                type="text"
+                                                className="input-field"
+                                                value={formData.campAddress}
+                                                onChange={(e) => setFormData({ ...formData, campAddress: e.target.value })}
+                                                placeholder="Community Hall, Park Street"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Camp City</label>
+                                            <input
+                                                type="text"
+                                                className="input-field"
+                                                value={formData.campCity}
+                                                onChange={(e) => setFormData({ ...formData, campCity: e.target.value })}
+                                                placeholder="Metro City"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Geolocation Section */}
                                 <div className="md:col-span-2 space-y-4 pt-4 border-t border-gray-100">
                                     <div className="flex justify-between items-center px-1">
@@ -263,11 +300,18 @@ const Profile = () => {
                     <div className="glass-card p-6 flex flex-col items-center justify-center text-center space-y-4 border-t-4 border-medical-secondary">
                         <div className="bg-white p-3 rounded-3xl shadow-md border border-gray-100" id="camp-qr">
                             <QRCodeSVG
-                                value={
-                                    profile?.location?.lat
+                                value={JSON.stringify({
+                                    type: 'BLOOD_CAMP',
+                                    name: profile?.hospitalName || '',
+                                    address: profile?.campAddress || profile?.address || '',
+                                    city: profile?.campCity || profile?.city || '',
+                                    location: { lat: profile?.location?.lat, lng: profile?.location?.lng },
+                                    mapsUrl: profile?.location?.lat
                                         ? `https://www.google.com/maps/search/?api=1&query=${profile.location.lat},${profile.location.lng}`
-                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
-                                }
+                                        : profile?.campCity
+                                            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.campAddress || '') + ' ' + profile.campCity)}`
+                                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
+                                })}
                                 size={180}
                                 level="H"
                                 includeMargin={true}

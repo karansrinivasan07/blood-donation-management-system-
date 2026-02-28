@@ -9,6 +9,8 @@ const hospitalProfileSchema = new mongoose.Schema({
     contactEmail: { type: String },
     contactPhone: { type: String },
     isCampActive: { type: Boolean, default: true },
+    campAddress: { type: String, default: '' },
+    campCity: { type: String, default: '' },
     location: {
         lat: { type: Number },
         lng: { type: Number }

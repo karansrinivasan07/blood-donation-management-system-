@@ -14,7 +14,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { hospitalName, address, city, pincode, location, contactEmail, contactPhone, isCampActive } = req.body;
+        const { hospitalName, address, city, pincode, location, contactEmail, contactPhone, isCampActive, campAddress, campCity } = req.body;
         let profile = await HospitalProfile.findOne({ userId: req.user.id });
 
         if (!profile) {
@@ -29,6 +29,8 @@ exports.updateProfile = async (req, res) => {
         profile.contactEmail = contactEmail || profile.contactEmail;
         profile.contactPhone = contactPhone || profile.contactPhone;
         profile.isCampActive = isCampActive !== undefined ? isCampActive : profile.isCampActive;
+        profile.campAddress = campAddress || profile.campAddress;
+        profile.campCity = campCity || profile.campCity;
 
         await profile.save();
         res.json(profile);

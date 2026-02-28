@@ -193,7 +193,9 @@ const Dashboard = () => {
                                 value={
                                     profile?.location?.lat
                                         ? `https://www.google.com/maps/search/?api=1&query=${profile.location.lat},${profile.location.lng}`
-                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
+                                        : profile?.campCity
+                                            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.campAddress || '') + ' ' + profile.campCity)}`
+                                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((profile?.hospitalName || '') + ' ' + (profile?.city || ''))}`
                                 }
                                 size={120}
                                 level="H"
