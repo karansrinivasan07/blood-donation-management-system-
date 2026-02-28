@@ -6,6 +6,9 @@ const hospitalProfileSchema = new mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String, required: true },
     pincode: { type: String, required: true },
+    contactEmail: { type: String },
+    contactPhone: { type: String },
+    isCampActive: { type: Boolean, default: true },
     location: {
         lat: { type: Number },
         lng: { type: Number }
