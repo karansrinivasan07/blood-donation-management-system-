@@ -194,45 +194,9 @@ const Profile = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-4">
-                                            <div className="space-y-1">
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Site by Address</label>
-                                                <div className="flex gap-2">
-                                                    <input
-                                                        type="text"
-                                                        id="site-search"
-                                                        className="input-field py-2 flex-1"
-                                                        placeholder="e.g. City Mall, NY"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={async () => {
-                                                            const query = document.getElementById('site-search').value;
-                                                            if (!query) return;
-                                                            toast.loading('Searching address...', { id: 'search-geo' });
-                                                            try {
-                                                                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
-                                                                const results = await res.json();
-                                                                if (results.length > 0) {
-                                                                    const { lat, lon } = results[0];
-                                                                    setFormData(p => ({ ...p, location: { lat: parseFloat(lat), lng: parseFloat(lon) } }));
-                                                                    toast.success('Location found!', { id: 'search-geo' });
-                                                                } else {
-                                                                    toast.error('No results found', { id: 'search-geo' });
-                                                                }
-                                                            } catch (err) {
-                                                                toast.error('Search failed', { id: 'search-geo' });
-                                                            }
-                                                        }}
-                                                        className="bg-medical-secondary text-white px-4 rounded-xl hover:bg-medical-secondary/90 transition-all font-bold text-xs"
-                                                    >
-                                                        Search
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 mt-4">
+                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100/50">
                                                 <p className="text-[11px] text-blue-700 leading-relaxed italic">
-                                                    Donors scanning your QR will navigate to these exact coordinates. You can pin your current location or search for the address above.
+                                                    Donors scanning your QR will navigate to these exact coordinates. Use the "Pin My Current Site" button above to lock in the camp's GPS location.
                                                 </p>
                                             </div>
                                         </div>
