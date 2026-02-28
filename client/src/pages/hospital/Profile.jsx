@@ -230,33 +230,9 @@ const Profile = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div className="space-y-1">
-                                                    <label className="text-[10px] font-black text-gray-400 uppercase">Latitude</label>
-                                                    <input
-                                                        type="number"
-                                                        step="any"
-                                                        className="input-field py-2"
-                                                        placeholder="e.g. 40.7128"
-                                                        value={formData.location.lat || ''}
-                                                        onChange={(e) => setFormData(p => ({ ...p, location: { ...p.location, lat: parseFloat(e.target.value) } }))}
-                                                    />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[10px] font-black text-gray-400 uppercase">Longitude</label>
-                                                    <input
-                                                        type="number"
-                                                        step="any"
-                                                        className="input-field py-2"
-                                                        placeholder="e.g. -74.0060"
-                                                        value={formData.location.lng || ''}
-                                                        onChange={(e) => setFormData(p => ({ ...p, location: { ...p.location, lng: parseFloat(e.target.value) } }))}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100/50">
+                                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 mt-4">
                                                 <p className="text-[11px] text-blue-700 leading-relaxed italic">
-                                                    Donors scanning your QR will navigate to these exact coordinates. You can pin your current location or search for the address.
+                                                    Donors scanning your QR will navigate to these exact coordinates. You can pin your current location or search for the address above.
                                                 </p>
                                             </div>
                                         </div>
