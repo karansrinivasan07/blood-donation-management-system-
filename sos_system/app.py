@@ -28,7 +28,7 @@ maps_service = MapsService()
 def index():
     return "SOS Blood Alert System Active"
 
-@app.route("/api/hospital/sos-alert", methods=["POST"])
+@app.route("/api/hospital/emergency-broadcast", methods=["POST"])
 def trigger_sos():
     data = request.json
     blood_type = data.get("blood_type")
@@ -63,7 +63,7 @@ def get_active_requests(hospital_id):
         r["hospital_id"] = str(r["hospital_id"])
     return jsonify(requests)
 
-@app.route("/api/donor/respond-sos/<request_id>", methods=["POST"])
+@app.route("/api/donor/accept-broadcast/<request_id>", methods=["POST"])
 def respond_sos(request_id):
     data = request.json
     donor_id = data.get("donor_id")

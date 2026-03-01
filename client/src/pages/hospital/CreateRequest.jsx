@@ -35,7 +35,7 @@ const CreateRequest = () => {
         }
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5001/api/hospital/sos-alert', {
+            const response = await fetch('http://localhost:5001/api/hospital/emergency-broadcast', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
