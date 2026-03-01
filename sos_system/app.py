@@ -1,8 +1,10 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId
+from datetime import datetime
 from dotenv import load_dotenv
 
 from models.sos_request import SOSRequest
@@ -14,6 +16,7 @@ from services.maps_service import MapsService
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Database Setup
@@ -28,7 +31,7 @@ maps_service = MapsService()
 def index():
     return "SOS Blood Alert System Active"
 
-@app.route("/api/hospital/emergency-broadcast", methods=["POST"])
+@app.route("/api/v1/notify-service", methods=["POST"])
 def trigger_sos():
     data = request.json
     blood_type = data.get("blood_type")
@@ -55,7 +58,7 @@ def trigger_sos():
     </div>
     """
 
-@app.route("/api/sos/active-requests/<hospital_id>", methods=["GET"])
+@app.route("/api/v1/update-status/<hospital_id>", methods=["GET"])
 def get_active_requests(hospital_id):
     requests = list(db.sos_requests.find({"hospital_id": ObjectId(hospital_id), "status": "ACTIVE"}))
     for r in requests:
@@ -63,7 +66,7 @@ def get_active_requests(hospital_id):
         r["hospital_id"] = str(r["hospital_id"])
     return jsonify(requests)
 
-@app.route("/api/donor/accept-broadcast/<request_id>", methods=["POST"])
+@app.route("/api/v1/respond-to-call/<request_id>", methods=["POST"])
 def respond_sos(request_id):
     data = request.json
     donor_id = data.get("donor_id")
@@ -114,4 +117,4 @@ def handle_location_update(data):
         }, room=str(sos_req["hospital_id"]))
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=5001)
+    socketio.run(app, debug=True, port=5005)
