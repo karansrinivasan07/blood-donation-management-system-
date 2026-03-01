@@ -28,6 +28,36 @@ const CreateRequest = () => {
         }
     };
 
+    const handleSOS = async () => {
+        if (!formData.bloodGroup) {
+            toast.error('Please select a blood group first');
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:5001/api/hospital/sos-alert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    blood_type: formData.bloodGroup,
+                    units_needed: formData.unitsRequired,
+                    hospital_lat: 13.0827, // In a real app, these would be from hospital profile
+                    hospital_lng: 80.2707,
+                    hospital_id: "65e01234567890abcdef1234"
+                })
+            });
+            // eslint-disable-next-line no-unused-vars
+            const html = await response.text();
+            toast.success('SOS Alert Broadcasted!');
+            // You could potentially show the response HTML in a modal here
+            window.open('http://localhost:5001/templates/hospital_sos.html', '_blank');
+        } catch (err) {
+            toast.error('SOS Alert Failed. Is the SOS server running?');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="max-w-2xl mx-auto space-y-8">
             <div>
@@ -35,7 +65,7 @@ const CreateRequest = () => {
                 <p className="text-gray-500">Provide details for the required blood donation</p>
             </div>
 
-            <div className="glass-card p-8">
+            <div className="glass-card p-8 text-white">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
@@ -99,13 +129,24 @@ const CreateRequest = () => {
                         <p><strong>Note:</strong> Posting accurate urgency levels helps our donors prioritize critical needs. Please only use Critical for immediate life-saving situations.</p>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="btn-secondary w-full py-3 flex items-center justify-center gap-2 font-bold shadow-lg shadow-medical-secondary/20"
-                    >
-                        {loading ? 'Posting...' : <><Send size={18} /> Publish Request</>}
-                    </button>
+                    <div className="flex flex-col gap-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="btn-secondary w-full py-3 flex items-center justify-center gap-2 font-bold shadow-lg shadow-medical-secondary/20"
+                        >
+                            {loading ? 'Posting...' : <><Send size={18} /> Publish Request</>}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleSOS}
+                            disabled={loading}
+                            className="bg-red-600 hover:bg-red-700 text-white w-full py-4 rounded-xl flex items-center justify-center gap-2 font-black text-lg animate-pulse shadow-xl shadow-red-500/30"
+                        >
+                            <AlertCircle size={24} /> TRIGGER SOS EMERGENCY ALERT
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
