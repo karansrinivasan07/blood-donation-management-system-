@@ -87,5 +87,6 @@
 }
 
 .scanner-laser {
-  @apply absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-medical-primary to-transparent shadow-[0_0_15px_rgba(225, 29, 72, 0.8)] z-10;
+  @apply absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-medical-primary to-transparent z-10;
+  box-shadow: 0 0 15px rgba(225, 29, 72, 0.8);
 }
