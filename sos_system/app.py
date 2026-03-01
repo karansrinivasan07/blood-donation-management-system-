@@ -47,12 +47,13 @@ def trigger_sos():
     hospital_name = "City Hospital" # In reality look up from DB
     notify_service.broadcast_sos(donors, blood_type, hospital_name)
     
-    return jsonify({
-        "status": "success",
-        "request_id": request_id,
-        "matched_donors_count": len(donors),
-        "estimated_response_time": "10-20 mins"
-    })
+    return f"""
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6 animate-bounce">
+        <p class="text-green-800 font-bold text-xl">🚀 SOS Alert Broadcasted!</p>
+        <p class="text-green-600 mt-2 font-semibold">Found <span class="text-2xl">{len(donors)}</span> donors within 10km ready to respond.</p>
+        <p class="text-sm text-green-500 italic mt-1">Waiting for first acceptance...</p>
+    </div>
+    """
 
 @app.route("/api/sos/active-requests/<hospital_id>", methods=["GET"])
 def get_active_requests(hospital_id):

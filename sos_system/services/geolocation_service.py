@@ -1,4 +1,5 @@
 import math
+from datetime import datetime
 
 def haversine(lat1, lon1, lat2, lon2):
     """
@@ -32,13 +33,10 @@ class GeolocationService:
                     },
                     "$maxDistance": radius_km * 1000
                 }
-            }
+            },
+            "blood_type": blood_type, # Ensure blood type match
+            "eligible_until": {"$gt": datetime.utcnow()} # Basic eligibility check
         }
         
-        # In this implementation, we assume the donor_locations collection 
-        # might need to be joined with a users collection if blood_type is not there
-        # For simplicity, we'll assume blood_type is stored in donor_locations or linked
-        
         donors = db.donor_locations.find(query)
-        # We can further refine with haversine if needed, but MongoDB nearSphere is typically sufficient
         return list(donors)

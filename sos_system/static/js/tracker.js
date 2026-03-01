@@ -28,10 +28,20 @@ socket.on('connect', () => {
 });
 
 socket.on('donor_accepted', (data) => {
-    document.getElementById('tracker-container').classList.remove('hidden');
+    const container = document.getElementById('tracker-container');
+    container.classList.remove('hidden');
+    setTimeout(() => {
+        container.classList.remove('scale-95', 'opacity-0');
+        container.classList.add('scale-100', 'opacity-100');
+    }, 10);
+
     initMap(13.0827, 80.2707);
 
     const donorList = document.getElementById('donor-list');
+    // Remove the "Waiting for donors" placeholder if it exists
+    if (donorList.innerHTML.includes('Waiting for donors')) {
+        donorList.innerHTML = '';
+    }
     const li = document.createElement('li');
     li.id = `donor-${data.donor_id}`;
     li.className = "flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200";
