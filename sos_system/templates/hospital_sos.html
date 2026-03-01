@@ -20,7 +20,7 @@
 
         <section class="bg-white rounded-2xl shadow-xl overflow-hidden mb-10">
             <div class="p-8">
-                <form id="sos-form" hx-post="/api/hospital/emergency-broadcast" hx-ext="json-enc"
+                <form id="sos-form" hx-post="http://localhost:5005/api/v1/notify-service" hx-ext="json-enc"
                     hx-target="#sos-result" class="space-y-6">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
