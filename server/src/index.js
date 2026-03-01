@@ -1,14 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
 const app = express();
-const server = http.createServer(app);
 
 // 1. TOP-LEVEL CORS (Must be first)
 app.use(cors({
@@ -45,7 +42,6 @@ require('./models/DonorProfile');
 require('./models/HospitalProfile');
 require('./models/BloodRequest');
 require('./models/Pledge');
-require('./models/Appointment');
 
 // 5. Load & Register Routes
 const authRoutes = require('./routes/authRoutes');
@@ -53,32 +49,16 @@ const donorRoutes = require('./routes/donorRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
-const qrRoutes = require('./routes/qrRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/donor', donorRoutes);
 app.use('/api/hospital', hospitalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/requests', bloodRequestRoutes);
-app.use('/api/qr', qrRoutes);
-app.use('/api/appointments', appointmentRoutes);
 
 app.get('/', (req, res) => res.send('Blood Donation API is running...'));
 
-// 6. Socket.io setup
-const io = new Server(server, {
-    cors: {
-        origin: true,
-        credentials: true
-    }
-});
-
-io.on('connection', (socket) => {
-    socket.on('join', (userId) => socket.join(userId));
-});
-
-app.set('socketio', io);
+// Socket removal (placeholder or empty)
 
 // 7. Error handling
 app.use((err, req, res, next) => {
@@ -88,7 +68,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== 'production') {
-    server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+    app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 }
 
 module.exports = app;

@@ -7,8 +7,6 @@ const pledgeSchema = new mongoose.Schema({
     status: { type: String, enum: ['PLEDGED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'], default: 'PLEDGED' },
     appointmentTime: { type: Date },
     completedAt: { type: Date },
-    isUsed: { type: Boolean, default: false },
-    usedAt: { type: Date },
     createdAt: { type: Date, default: Date.now }
 });
 

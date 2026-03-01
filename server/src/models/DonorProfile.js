@@ -10,12 +10,7 @@ const donorProfileSchema = new mongoose.Schema({
     location: {
         lat: { type: Number },
         lng: { type: Number }
-    },
-    donationCount: { type: Number, default: 0 },
-    badges: [{
-        name: { type: String },
-        awardedAt: { type: Date, default: Date.now }
-    }]
+    }
 });
 
 module.exports = mongoose.model('DonorProfile', donorProfileSchema);
