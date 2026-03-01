@@ -1,9 +1,0 @@
-flask
-flask-socketio
-flask-cors
-pymongo
-python-dotenv
-requests
-twilio
-firebase-admin
-geopy
