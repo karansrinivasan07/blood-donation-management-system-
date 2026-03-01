@@ -4,41 +4,29 @@ const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const cors = require('cors');
 const connectDB = require('./config/db');
 
 const app = express();
 const server = http.createServer(app);
 
-// 1. TOP-LEVEL MANUAL CORS (First middleware, no exceptions)
-const allowedOrigins = [
-    'http://localhost:5173',
-    'https://flashsaver.vercel.app',
-    'https://blood-donation-management-system-beryl.vercel.app'
-];
+// 1. TOP-LEVEL CORS (Must be first)
+app.use(cors({
+    origin: true, // Reflects request origin
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    optionsSuccessStatus: 200
+}));
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    } else if (!origin) {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-    next();
-});
+// Explicit Preflight Handling
+app.options('*', cors());
 
 // 2. Standard Middleware
 app.use(express.json());
 app.use(morgan('dev'));
 
-// 3. LAZY DATABASE CONNECTION (Ensures CORS is already set)
+// 3. LAZY DATABASE CONNECTION
 app.use(async (req, res, next) => {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -51,7 +39,15 @@ app.use(async (req, res, next) => {
     }
 });
 
-// 4. Load Routes & Models
+// 4. Load Models (Required for population)
+require('./models/User');
+require('./models/DonorProfile');
+require('./models/HospitalProfile');
+require('./models/BloodRequest');
+require('./models/Pledge');
+require('./models/Appointment');
+
+// 5. Load & Register Routes
 const authRoutes = require('./routes/authRoutes');
 const donorRoutes = require('./routes/donorRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
@@ -59,12 +55,6 @@ const adminRoutes = require('./routes/adminRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
 const qrRoutes = require('./routes/qrRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
-
-require('./models/User');
-require('./models/DonorProfile');
-require('./models/HospitalProfile');
-require('./models/BloodRequest');
-require('./models/Pledge');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/donor', donorRoutes);
@@ -76,7 +66,7 @@ app.use('/api/appointments', appointmentRoutes);
 
 app.get('/', (req, res) => res.send('Blood Donation API is running...'));
 
-// 5. Socket.io setup
+// 6. Socket.io setup
 const io = new Server(server, {
     cors: {
         origin: true,
@@ -90,7 +80,7 @@ io.on('connection', (socket) => {
 
 app.set('socketio', io);
 
-// 6. Error handling
+// 7. Error handling
 app.use((err, req, res, next) => {
     console.error('SERVER ERROR:', err.stack);
     res.status(500).json({ message: 'Internal Server Error' });
