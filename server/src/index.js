@@ -27,30 +27,25 @@ require('./models/Pledge');
 const app = express();
 
 // Simple and robust CORS config for Vercel
-// Simple and robust CORS config for Vercel
 const allowedOrigins = [
     'http://localhost:5173',
     'https://flashsaver.vercel.app',
     'https://blood-donation-management-system-beryl.vercel.app'
 ];
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin) {
-        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-            res.setHeader('Access-Control-Allow-Origin', origin);
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-    }
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-    next();
-});
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -101,8 +96,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
-        methods: ['GET', 'POST']
+        origin: true,
+        credentials: true
     }
 });
 
