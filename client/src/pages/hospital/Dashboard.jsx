@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Clock, Users, ArrowRight, Activity, Droplet } from 'lucide-react';
+import { Plus, Clock, Users, ArrowRight, Activity, Droplet, MapPin, Calendar, Package, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Dashboard = () => {
