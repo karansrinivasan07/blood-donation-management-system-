@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api, { setAuthToken } from '../api/axios';
+import api from '../api/axios';
 
 const AuthContext = createContext();
 
@@ -12,14 +12,14 @@ export const AuthProvider = ({ children }) => {
         const checkAuth = async () => {
             const token = localStorage.getItem('token');
             if (token) {
-                setAuthToken(token);
+
                 try {
                     const { data } = await api.get('/auth/me');
                     setUser(data.user);
                     setProfile(data.profile);
                 } catch (err) {
                     localStorage.removeItem('token');
-                    setAuthToken(null);
+
                 }
             }
             setLoading(false);
