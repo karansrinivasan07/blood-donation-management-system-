@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
-import { Search, MapPin, Droplets, Clock, ChevronRight, Activity } from 'lucide-react';
+import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
+    const [showScanner, setShowScanner] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -22,6 +24,27 @@ const Dashboard = () => {
             toast.error('Failed to fetch requests');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleScan = (data) => {
+        try {
+            const scanData = JSON.parse(data);
+            if (scanData.type === 'BLOOD_CAMP') {
+                toast.success(`Found: ${scanData.name}`);
+                setShowScanner(false);
+                if (scanData.mapsUrl) {
+                    if (window.confirm(`Open directions for ${scanData.name}?`)) {
+                        window.open(scanData.mapsUrl, '_blank');
+                    }
+                } else {
+                    toast.error('Location details not found in QR');
+                }
+            } else {
+                toast.error('This is not a Blood Camp QR code');
+            }
+        } catch (err) {
+            toast.error('Could not parse QR Code');
         }
     };
 
@@ -45,34 +68,39 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
                 <div>
                     <h1 className="text-3xl font-bold text-medical-dark">Available Requests</h1>
                     <p className="text-gray-500 font-medium">Find people who need your help in {filters.city || 'all cities'}</p>
                 </div>
-
-                <div className="flex gap-4 items-center">
-                    <div className="input-group">
-                        <Search size={18} />
-                        <input
-                            type="text"
-                            placeholder="Filter by city..."
-                            className="input-field"
-                            value={filters.city}
-                            onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-                        />
-                    </div>
-                    <select
-                        className="input-field w-32"
-                        value={filters.bloodGroup}
-                        onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
-                    >
-                        <option value="">Any Group</option>
-                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                    </select>
-                </div>
+                <button
+                    onClick={() => setShowScanner(true)}
+                    className="btn-secondary flex items-center gap-2 px-6 py-3"
+                >
+                    <QrCode size={20} /> Scan Camp QR
+                </button>
             </div>
 
+            <div className="flex gap-4 items-center">
+                <div className="input-group">
+                    <Search size={18} />
+                    <input
+                        type="text"
+                        placeholder="Filter by city..."
+                        className="input-field"
+                        value={filters.city}
+                        onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
+                    />
+                </div>
+                <select
+                    className="input-field w-32"
+                    value={filters.bloodGroup}
+                    onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
+                >
+                    <option value="">Any Group</option>
+                    {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                </select>
+            </div>
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse"></div>)}
@@ -118,6 +146,15 @@ const Dashboard = () => {
                     <h3 className="text-xl font-bold text-gray-500">No requests found</h3>
                     <p className="text-gray-400">Try changing your filters or location</p>
                 </div>
+            )}
+
+            {showScanner && (
+                <QRScanner
+                    onScan={handleScan}
+                    onClose={() => setShowScanner(false)}
+                    title="Scan Blood Camp QR"
+                    description="Scan the QR code displayed at the hospital or blood donation camp to get navigation and details."
+                />
             )}
         </div>
     );

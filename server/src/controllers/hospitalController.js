@@ -221,3 +221,40 @@ exports.markUnitAsUsed = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+exports.completePledgeDirectly = async (req, res) => {
+    try {
+        const { pledgeId } = req.params;
+        const pledge = await Pledge.findById(pledgeId).populate('requestId');
+        if (!pledge) return res.status(404).json({ message: 'Pledge not found' });
+
+        // Verify hospital owns the request associated with this pledge
+        if (pledge.requestId.hospitalId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized access to this pledge' });
+        }
+
+        pledge.status = 'COMPLETED';
+        pledge.completedAt = new Date();
+
+        const donorProfile = await DonorProfile.findOne({ userId: pledge.donorId });
+        if (donorProfile) {
+            donorProfile.lastDonationDate = new Date();
+            donorProfile.donationCount = (donorProfile.donationCount || 0) + 1;
+
+            // Badge Logic
+            const badges = donorProfile.badges || [];
+            const badgeNames = badges.map(b => b.name);
+            if (donorProfile.donationCount >= 1 && !badgeNames.includes('Newbie')) badges.push({ name: 'Newbie' });
+            if (donorProfile.donationCount >= 3 && !badgeNames.includes('Regular')) badges.push({ name: 'Regular' });
+            if (donorProfile.donationCount >= 10 && !badgeNames.includes('Vanguard')) badges.push({ name: 'Vanguard' });
+
+            donorProfile.badges = badges;
+            await donorProfile.save();
+        }
+
+        await pledge.save();
+        res.json({ message: 'Donation completed successfully', pledge });
+    } catch (err) {
+        console.error('completePledgeDirectly Error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

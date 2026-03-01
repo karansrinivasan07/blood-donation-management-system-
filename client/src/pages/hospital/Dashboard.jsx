@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Clock, Users, ArrowRight, Activity, Droplet, MapPin, Calendar, Package, Heart } from 'lucide-react';
+import { Plus, Clock, Users, ArrowRight, Activity, Droplet, MapPin, Calendar, Package, Heart, QrCode } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState({ active: 0, fulfilled: 0, totalPledges: 0 });
+    const [showScanner, setShowScanner] = useState(false);
 
     const { profile } = useAuth();
 
@@ -33,6 +35,33 @@ const Dashboard = () => {
         }
     };
 
+    const handleScan = async (data) => {
+        try {
+            const scanData = JSON.parse(data);
+            if (scanData.type === 'PLEDGE_VERIFICATION') {
+                toast.success(`Verified: ${scanData.donorName} (${scanData.bloodGroup})`);
+                setShowScanner(false);
+                // Redirect to request details or show confirmation modal
+                // For now, let's find which request this pledge belongs to if we can,
+                // or just stay here and maybe trigger a "complete" action?
+                // Actually, the best UX is to redirect to the specific request's detail page
+                // But we don't have the requestId in the QR yet! Let me add it.
+                // Wait, I can just use the pledgeId to fetch details or mark completed.
+
+                if (window.confirm(`Mark donation as completed for ${scanData.donorName}?`)) {
+                    await api.put(`/hospital/pledges/${scanData.pledgeId}/complete`);
+                    toast.success('Donation recorded successfully!');
+                    fetchRequests();
+                }
+            } else {
+                toast.error('Invalid QR Code type');
+            }
+        } catch (err) {
+            toast.error('Could not parse QR Code');
+            console.error(err);
+        }
+    };
+
     return (
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -40,9 +69,17 @@ const Dashboard = () => {
                     <h1 className="text-3xl font-bold text-medical-dark">Hospital Dashboard</h1>
                     <p className="text-gray-500 font-medium">Manage your blood requests and monitor pledges</p>
                 </div>
-                <Link to="/hospital/create-request" className="btn-primary flex items-center gap-2 h-fit">
-                    <Plus size={20} /> Post New Request
-                </Link>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowScanner(true)}
+                        className="btn-secondary flex items-center gap-2 h-fit"
+                    >
+                        <QrCode size={20} /> Scan Donor
+                    </button>
+                    <Link to="/hospital/create-request" className="btn-primary flex items-center gap-2 h-fit">
+                        <Plus size={20} /> Post New Request
+                    </Link>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -106,6 +143,15 @@ const Dashboard = () => {
                     </div>
                 )}
             </div>
+
+            {showScanner && (
+                <QRScanner
+                    onScan={handleScan}
+                    onClose={() => setShowScanner(false)}
+                    title="Scan Donor QR"
+                    description="Scan the QR code shown in the donor's 'My Pledges' section to verify their donation."
+                />
+            )}
         </div>
     );
 };

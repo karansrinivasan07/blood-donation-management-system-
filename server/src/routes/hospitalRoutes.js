@@ -11,5 +11,6 @@ router.get('/pledges/completed', auth(['HOSPITAL']), hospitalController.getCompl
 router.patch('/pledges/:id/mark-used', auth(['HOSPITAL']), hospitalController.markUnitAsUsed);
 router.patch('/requests/:id/status', auth(['HOSPITAL']), hospitalController.updateRequestStatus);
 router.put('/requests/:id/pledges/:pledgeId', auth(['HOSPITAL']), hospitalController.updatePledgeStatus);
+router.put('/pledges/:pledgeId/complete', auth(['HOSPITAL']), hospitalController.completePledgeDirectly);
 
 module.exports = router;
