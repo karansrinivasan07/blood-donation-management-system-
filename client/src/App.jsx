@@ -28,11 +28,13 @@ import AdminAnalytics from './pages/admin/Analytics';
 // Components
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotificationCelebration from './components/donor/NotificationCelebration';
 
 const App = () => {
     return (
-        <AuthProvider>
-            <Router>
+        <Router>
+            <AuthProvider>
+                <NotificationCelebration />
                 <div className="min-h-screen bg-medical-light">
                     <Navbar />
                     <main className="container mx-auto px-4 py-8">
@@ -69,8 +71,8 @@ const App = () => {
                     </main>
                     <Toaster position="bottom-right" />
                 </div>
-            </Router>
-        </AuthProvider>
+            </AuthProvider>
+        </Router>
     );
 };
 

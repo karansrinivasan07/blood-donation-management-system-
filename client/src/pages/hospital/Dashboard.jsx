@@ -9,16 +9,69 @@ import { QRCodeSVG } from 'qrcode.react';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+    const [inventory, setInventory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState({ active: 0, fulfilled: 0, totalPledges: 0 });
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [scanResult, setScanResult] = useState(null);
+    const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'appointments', or 'inventory'
 
     const { profile } = useAuth();
 
     useEffect(() => {
-        fetchRequests();
-    }, []);
+        if (activeTab === 'overview') fetchRequests();
+        if (activeTab === 'appointments') fetchAppointments();
+        if (activeTab === 'inventory') fetchInventory();
+    }, [activeTab]);
+
+    const fetchInventory = async () => {
+        setLoading(true);
+        try {
+            const { data } = await api.get('/hospital/requests');
+            // Fetch all COMPLETED pledges across all requests
+            // For simplicity, we'll fetch from a new endpoint or filter requests
+            // Let's assume we have a way to get all COMPLETED pledges for this hospital
+            const { data: pledges } = await api.get('/hospital/pledges/completed');
+            setInventory(pledges);
+        } catch (err) {
+            toast.error('Failed to load inventory');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const markAsUsed = async (id) => {
+        try {
+            await api.patch(`/hospital/pledges/${id}/mark-used`);
+            toast.success('Unit marked as used! Donor notified. ❤️');
+            fetchInventory();
+        } catch (err) {
+            toast.error('Failed to update inventory');
+        }
+    };
+
+    const fetchAppointments = async () => {
+        setLoading(true);
+        try {
+            const { data } = await api.get('/appointments/hospital');
+            setAppointments(data);
+        } catch (err) {
+            toast.error('Failed to load appointments');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateApptStatus = async (id, status) => {
+        try {
+            await api.patch(`/appointments/${id}/status`, { status });
+            toast.success(`Appointment ${status.toLowerCase()}`);
+            fetchAppointments();
+        } catch (err) {
+            toast.error('Failed to update status');
+        }
+    };
 
     const fetchRequests = async () => {
         try {
@@ -231,56 +284,209 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            <div className="space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2"><Clock size={20} /> Recent Requests</h2>
-                {loading ? (
-                    <div className="h-64 bg-gray-100 rounded-2xl animate-pulse"></div>
-                ) : requests.length > 0 ? (
-                    <div className="grid gap-4">
-                        {requests.map((request) => (
-                            <div key={request._id} className="glass-card p-5 group hover:border-medical-secondary transition-all">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-14 h-14 bg-medical-secondary/10 text-medical-secondary rounded-2xl flex items-center justify-center font-bold text-xl">
-                                            {request.bloodGroup}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-lg">Requested {request.unitsRequired} units</h4>
-                                            <p className="text-sm text-gray-500 italic">Needed before {new Date(request.requiredBefore).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
+            {/* Tab Switcher */}
+            <div className="flex p-1 bg-gray-100 rounded-2xl w-fit mb-8">
+                <button
+                    onClick={() => setActiveTab('overview')}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold ${activeTab === 'overview' ? 'bg-white text-medical-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <Activity size={18} /> Overview
+                </button>
+                <button
+                    onClick={() => setActiveTab('appointments')}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold ${activeTab === 'appointments' ? 'bg-white text-medical-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <Calendar size={18} /> Appointments {appointments.filter(a => a.status === 'PENDING').length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">New</span>}
+                </button>
+                <button
+                    onClick={() => setActiveTab('inventory')}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold ${activeTab === 'inventory' ? 'bg-white text-medical-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <Package size={18} /> Blood Inventory
+                </button>
+            </div>
 
-                                    <div className="flex items-center gap-6">
-                                        <div className="text-right">
-                                            <div className="flex flex-col items-end gap-1 mb-2">
-                                                <div className="flex items-center gap-2 text-medical-secondary font-bold text-sm">
-                                                    <Users size={16} /> {request.pledgeCount || 0} Pledges
+            <AnimatePresence mode="wait">
+                {activeTab === 'overview' ? (
+                    <motion.div
+                        key="overview"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="space-y-8"
+                    >
+                        <div className="space-y-4">
+                            <h2 className="text-xl font-bold flex items-center gap-2"><Clock size={20} /> Recent Requests</h2>
+                            {loading ? (
+                                <div className="h-64 bg-gray-100 rounded-2xl animate-pulse"></div>
+                            ) : requests.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {requests.map((request) => (
+                                        <div key={request._id} className="glass-card p-5 group hover:border-medical-secondary transition-all">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-14 h-14 bg-medical-secondary/10 text-medical-secondary rounded-2xl flex items-center justify-center font-bold text-xl">
+                                                        {request.bloodGroup}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-lg">Requested {request.unitsRequired} units</h4>
+                                                        <p className="text-sm text-gray-500 italic">Needed before {new Date(request.requiredBefore).toLocaleDateString()}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">
-                                                    {request.completedCount || 0} / {request.unitsRequired} Units Collected
+
+                                                <div className="flex items-center gap-6">
+                                                    <div className="text-right">
+                                                        <div className="flex flex-col items-end gap-1 mb-2">
+                                                            <div className="flex items-center gap-2 text-medical-secondary font-bold text-sm">
+                                                                <Users size={16} /> {request.pledgeCount || 0} Pledges
+                                                            </div>
+                                                            <div className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                                                                {request.completedCount || 0} / {request.unitsRequired} Units Collected
+                                                            </div>
+                                                        </div>
+                                                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${request.status === 'OPEN' ? 'bg-green-100 text-green-700' :
+                                                            request.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
+                                                            }`}>
+                                                            {request.status}
+                                                        </span>
+                                                        <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">{request.urgency} Priority</p>
+                                                    </div>
+                                                    <Link to={`/hospital/requests/${request._id}`} className="p-3 bg-gray-50 hover:bg-medical-secondary hover:text-white rounded-xl transition-all">
+                                                        <ArrowRight size={20} />
+                                                    </Link>
                                                 </div>
                                             </div>
-                                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${request.status === 'OPEN' ? 'bg-green-100 text-green-700' :
-                                                request.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                {request.status}
-                                            </span>
-                                            <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">{request.urgency} Priority</p>
                                         </div>
-                                        <Link to={`/hospital/requests/${request._id}`} className="p-3 bg-gray-50 hover:bg-medical-secondary hover:text-white rounded-xl transition-all">
-                                            <ArrowRight size={20} />
-                                        </Link>
-                                    </div>
+                                    ))}
                                 </div>
+                            ) : (
+                                <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                                    <p className="text-gray-500">No requests posted yet.</p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                ) : activeTab === 'appointments' ? (
+                    <motion.div
+                        key="appointments"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="space-y-6"
+                    >
+                        <h2 className="text-xl font-bold flex items-center gap-2"><Calendar size={20} /> Today's Schedule</h2>
+                        {loading ? (
+                            <div className="space-y-4">
+                                {[1, 2].map(i => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse"></div>)}
                             </div>
-                        ))}
-                    </div>
+                        ) : appointments.length > 0 ? (
+                            <div className="grid gap-4">
+                                {appointments.map(app => (
+                                    <div key={app._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 group hover:border-medical-primary transition-all">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-14 h-14 bg-medical-primary/10 rounded-2xl flex items-center justify-center text-medical-primary font-bold text-xl uppercase">
+                                                {app.donorProfile?.bloodGroup}
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg">{app.donorId?.name}</h3>
+                                                <div className="flex gap-4 text-xs text-gray-500">
+                                                    <span className="flex items-center gap-1"><Users size={12} /> {app.donorId?.phone}</span>
+                                                    <span className="flex items-center gap-1 font-bold text-medical-primary">Slot: {app.timeSlot}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-4">
+                                            {app.status === 'PENDING' ? (
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => updateApptStatus(app._id, 'CONFIRMED')}
+                                                        className="px-4 py-2 bg-green-500 text-white rounded-xl text-xs font-bold hover:bg-green-600 transition-colors"
+                                                    >
+                                                        Confirm
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updateApptStatus(app._id, 'CANCELLED')}
+                                                        className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </div>
+                                            ) : app.status === 'CONFIRMED' ? (
+                                                <button
+                                                    onClick={() => updateApptStatus(app._id, 'COMPLETED')}
+                                                    className="px-6 py-2 bg-medical-primary text-white rounded-xl text-xs font-bold hover:brightness-110 shadow-lg shadow-medical-primary/20 transition-all"
+                                                >
+                                                    Mark as Completed
+                                                </button>
+                                            ) : (
+                                                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${app.status === 'COMPLETED' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                    {app.status}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 bg-gray-50 rounded-3xl">
+                                <Calendar className="mx-auto text-gray-300 mb-4" size={48} />
+                                <h3 className="text-xl font-bold text-gray-500">No appointments for today</h3>
+                                <p className="text-gray-400">Scheduled donations will appear here.</p>
+                            </div>
+                        )}
+                    </motion.div>
                 ) : (
-                    <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                        <p className="text-gray-500">No requests posted yet.</p>
-                    </div>
+                    <motion.div
+                        key="inventory"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="space-y-6"
+                    >
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold flex items-center gap-2"><Package size={20} /> Collected Blood Units</h2>
+                            <p className="text-sm text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full">{inventory.length} Units Available</p>
+                        </div>
+
+                        {loading ? (
+                            <div className="space-y-4">
+                                {[1, 2].map(i => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse"></div>)}
+                            </div>
+                        ) : inventory.length > 0 ? (
+                            <div className="grid gap-4">
+                                {inventory.map(item => (
+                                    <div key={item._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-medical-primary transition-all">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center font-black text-xl">
+                                                {item.requestId?.bloodGroup}
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg">{item.donorId?.name}</h3>
+                                                <p className="text-xs text-gray-500">Collected on {new Date(item.completedAt).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => markAsUsed(item._id)}
+                                            className="px-6 py-3 bg-medical-dark text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-medical-primary transition-all flex items-center gap-2 shadow-lg shadow-gray-200"
+                                        >
+                                            <Heart size={14} /> Mark as Used
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 bg-gray-50 rounded-3xl">
+                                <Package className="mx-auto text-gray-300 mb-4" size={48} />
+                                <h3 className="text-xl font-bold text-gray-500">Inventory is empty</h3>
+                                <p className="text-gray-400">Mark donations as completed to see them here.</p>
+                            </div>
+                        )}
+                    </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
         </div>
     );
 };

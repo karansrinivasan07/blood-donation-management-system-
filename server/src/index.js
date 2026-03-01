@@ -10,6 +10,8 @@ const donorRoutes = require('./routes/donorRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
+const qrRoutes = require('./routes/qrRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 // Connect to Database
 connectDB();
@@ -69,6 +71,8 @@ app.use('/api/donor', donorRoutes);
 app.use('/api/hospital', hospitalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/requests', bloodRequestRoutes);
+app.use('/api/qr', qrRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 app.get('/', (req, res) => {
     res.send('Blood Donation API is running...');
@@ -83,11 +87,39 @@ app.use((err, req, res, next) => {
     });
 });
 
+const http = require('http');
+const { Server } = require('socket.io');
+
 const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ['GET', 'POST']
+    }
+});
+
+// Socket logic
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('join', (userId) => {
+        socket.join(userId);
+        console.log(`User ${userId} joined room`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+// Make io accessible globally
+app.set('socketio', io);
 
 // Only listen if not running as a Vercel serverless function
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 }
 
 module.exports = app;

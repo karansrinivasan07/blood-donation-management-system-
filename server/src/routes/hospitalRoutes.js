@@ -6,9 +6,11 @@ const auth = require('../middleware/auth');
 router.get('/profile', auth(['HOSPITAL']), hospitalController.getProfile);
 router.put('/profile', auth(['HOSPITAL']), hospitalController.updateProfile);
 router.get('/requests', auth(['HOSPITAL']), hospitalController.getHospitalRequests);
-router.post('/requests', auth(['HOSPITAL']), hospitalController.createRequest);
-router.get('/requests/:id/pledges', auth(['HOSPITAL']), hospitalController.getRequestPledges);
-router.put('/requests/:id', auth(['HOSPITAL']), hospitalController.updateRequestStatus);
+router.get('/pledges/completed', auth(['HOSPITAL']), hospitalController.getCompletedPledges);
+router.get('/pledges/:id', auth(['HOSPITAL']), hospitalController.getPledgeDetails);
+router.patch('/pledges/:id/status', auth(['HOSPITAL']), hospitalController.updatePledgeStatus);
+router.patch('/pledges/:id/mark-used', auth(['HOSPITAL']), hospitalController.markUnitAsUsed);
+router.patch('/requests/:id/status', auth(['HOSPITAL']), hospitalController.updateRequestStatus);
 router.put('/requests/:id/pledges/:pledgeId', auth(['HOSPITAL']), hospitalController.updatePledgeStatus);
 
 module.exports = router;
