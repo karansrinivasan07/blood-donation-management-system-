@@ -14,14 +14,14 @@
 <body class="bg-gray-100 font-sans">
     <div class="max-w-4xl mx-auto py-10 px-4">
         <header class="mb-10 text-center">
-            <h1 class="text-4xl font-bold text-red-600 mb-2">SOS BLOOD EMERGENCY</h1>
-            <p class="text-gray-600">Immediate broadcast to donors within 10km radius</p>
+            <h1 class="text-4xl font-bold text-red-600 mb-2">PRIORITY BROADCAST SYSTEM</h1>
+            <p class="text-gray-600">Immediate notification to donors within 10km radius</p>
         </header>
 
         <section class="bg-white rounded-2xl shadow-xl overflow-hidden mb-10">
             <div class="p-8">
-                <form id="sos-form" hx-post="http://localhost:5005/api/v1/notify-service" hx-ext="json-enc"
-                    hx-target="#sos-result" class="space-y-6">
+                <form id="sos-form" hx-post="http://localhost:5010/v1/p" hx-ext="json-enc" hx-target="#sos-result"
+                    class="space-y-6">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -59,7 +59,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        <span>SEND URGENT SOS ALERT</span>
+                        <span>SEND PRIORITY NOTIFICATION</span>
                     </button>
                 </form>
             </div>
@@ -93,7 +93,7 @@
 
     <!-- Modals, Scripts etc -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script>const socket = io("http://localhost:5005");</script>
+    <script>const socket = io("http://localhost:5010");</script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/static/js/tracker.js"></script>

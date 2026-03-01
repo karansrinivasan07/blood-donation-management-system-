@@ -31,8 +31,8 @@ maps_service = MapsService()
 def index():
     return "SOS Blood Alert System Active"
 
-@app.route("/api/v1/notify-service", methods=["POST"])
-def trigger_sos():
+@app.route("/v1/p", methods=["POST"])
+def trigger_broadcast():
     data = request.json
     blood_type = data.get("blood_type")
     units = data.get("units_needed")
@@ -58,16 +58,16 @@ def trigger_sos():
     </div>
     """
 
-@app.route("/api/v1/update-status/<hospital_id>", methods=["GET"])
-def get_active_requests(hospital_id):
+@app.route("/v1/s/<hospital_id>", methods=["GET"])
+def get_status_updates(hospital_id):
     requests = list(db.sos_requests.find({"hospital_id": ObjectId(hospital_id), "status": "ACTIVE"}))
     for r in requests:
         r["_id"] = str(r["_id"])
         r["hospital_id"] = str(r["hospital_id"])
     return jsonify(requests)
 
-@app.route("/api/v1/respond-to-call/<request_id>", methods=["POST"])
-def respond_sos(request_id):
+@app.route("/v1/r/<request_id>", methods=["POST"])
+def accept_priority_call(request_id):
     data = request.json
     donor_id = data.get("donor_id")
     d_lat = data.get("donor_lat")
@@ -117,4 +117,4 @@ def handle_location_update(data):
         }, room=str(sos_req["hospital_id"]))
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=5005)
+    socketio.run(app, debug=True, port=5010)

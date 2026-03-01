@@ -20,7 +20,7 @@ function initMap(lat, lng) {
 }
 
 // SocketIO Integration
-const socket = io("http://localhost:5005");
+const socket = io("http://localhost:5010");
 const hospitalId = "65e01234567890abcdef1234"; // Should be dynamic
 
 socket.on('connect', () => {

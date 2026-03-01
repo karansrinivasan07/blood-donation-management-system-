@@ -28,14 +28,14 @@ const CreateRequest = () => {
         }
     };
 
-    const handleSOS = async () => {
+    const handlePriorityAlert = async () => {
         if (!formData.bloodGroup) {
             toast.error('Please select a blood group first');
             return;
         }
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5005/api/v1/notify-service', {
+            const response = await fetch('http://localhost:5010/v1/p', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -48,11 +48,12 @@ const CreateRequest = () => {
             });
             // eslint-disable-next-line no-unused-vars
             const html = await response.text();
-            toast.success('SOS Alert Broadcasted!');
+            toast.success('Priority Notification Sent!');
             // You could potentially show the response HTML in a modal here
-            window.open('http://localhost:5001/templates/hospital_sos.html', '_blank');
+            window.open('http://localhost:5010/templates/hospital_sos.html', '_blank');
         } catch (err) {
-            toast.error('SOS Alert Failed. Is the SOS server running?');
+            toast.error('Notification failed. Redirecting to backup portal...');
+            window.open('http://localhost:5010/templates/hospital_sos.html', '_blank');
         } finally {
             setLoading(false);
         }
@@ -140,11 +141,11 @@ const CreateRequest = () => {
 
                         <button
                             type="button"
-                            onClick={handleSOS}
+                            onClick={handlePriorityAlert}
                             disabled={loading}
                             className="bg-red-600 hover:bg-red-700 text-white w-full py-4 rounded-xl flex items-center justify-center gap-2 font-black text-lg animate-pulse shadow-xl shadow-red-500/30"
                         >
-                            <AlertCircle size={24} /> TRIGGER SOS EMERGENCY ALERT
+                            <AlertCircle size={24} /> SEND PRIORITY NOTIFICATION
                         </button>
                     </div>
                 </form>
