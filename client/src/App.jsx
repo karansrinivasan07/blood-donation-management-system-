@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
 // Lazy load pages with chunk error handling
 const lazyWithRetry = (componentImport) => React.lazy(async () => {
