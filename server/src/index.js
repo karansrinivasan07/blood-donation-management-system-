@@ -30,12 +30,13 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:5173',
     'https://flashsaver.vercel.app',
-    process.env.CLIENT_URL
-].filter(Boolean);
+    'https://blood-donation-management-system-beryl.vercel.app'
+];
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps) or matching origins
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -43,8 +44,12 @@ app.use(cors({
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 200
 }));
+
+// Explicitly handle preflight requests
+app.options('*', cors());
 
 app.use(express.json());
 app.use(morgan('dev'));
