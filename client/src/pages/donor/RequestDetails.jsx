@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
-import { MapPin, Building2, Droplets, Calendar, AlertCircle, Heart } from 'lucide-react';
+import { MapPin, Building2, Droplets, Calendar, AlertCircle, Heart, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const RequestDetails = () => {
     const { id } = useParams();
@@ -95,6 +96,49 @@ const RequestDetails = () => {
                 </div>
 
                 <div className="space-y-6">
+                    {/* Camp QR Code Section */}
+                    {request.hospitalProfile?.isCampActive && (
+                        <div className="glass-card p-6 border-t-4 border-medical-secondary bg-white text-center space-y-4">
+                            <div className="flex items-center justify-center gap-2 text-medical-secondary mb-2">
+                                <QrCode size={20} />
+                                <h3 className="text-lg font-black uppercase tracking-tighter">Camp Location QR</h3>
+                            </div>
+
+                            <div className="bg-gray-50 p-3 rounded-2xl inline-block border border-gray-100 shadow-inner">
+                                <QRCodeSVG
+                                    value={JSON.stringify({
+                                        type: 'BLOOD_CAMP',
+                                        name: request.hospitalProfile.hospitalName,
+                                        address: request.hospitalProfile.campAddress || request.hospitalProfile.address,
+                                        city: request.hospitalProfile.campCity || request.hospitalProfile.city,
+                                        location: request.hospitalProfile.location,
+                                        mapsUrl: request.hospitalProfile.location?.lat
+                                            ? `https://www.google.com/maps/search/?api=1&query=${request.hospitalProfile.location.lat},${request.hospitalProfile.location.lng}`
+                                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((request.hospitalProfile.campAddress || request.hospitalProfile.address) + ' ' + (request.hospitalProfile.campCity || request.hospitalProfile.city))}`
+                                    })}
+                                    size={180}
+                                    level="H"
+                                />
+                            </div>
+
+                            <p className="text-[11px] text-gray-500 font-medium leading-relaxed px-2">
+                                Scan this at the camp location or use it to navigate directly to the site.
+                            </p>
+
+                            <button
+                                onClick={() => {
+                                    const mapsUrl = request.hospitalProfile.location?.lat
+                                        ? `https://www.google.com/maps/search/?api=1&query=${request.hospitalProfile.location.lat},${request.hospitalProfile.location.lng}`
+                                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((request.hospitalProfile.campAddress || request.hospitalProfile.address) + ' ' + (request.hospitalProfile.campCity || request.hospitalProfile.city))}`;
+                                    window.open(mapsUrl, '_blank');
+                                }}
+                                className="w-full bg-medical-secondary/10 text-medical-secondary py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-medical-secondary/20 transition-all border border-medical-secondary/20"
+                            >
+                                Open in Google Maps
+                            </button>
+                        </div>
+                    )}
+
                     <div className="glass-card p-6 bg-medical-dark text-white border-none">
                         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                             <Heart className="text-medical-primary fill-medical-primary" /> Pledge to Donate
@@ -113,8 +157,8 @@ const RequestDetails = () => {
                             onClick={handlePledge}
                             disabled={pledging || !isEligible}
                             className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${isEligible
-                                    ? 'bg-medical-primary hover:bg-medical-primary/90 text-white animate-pulse'
-                                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                ? 'bg-medical-primary hover:bg-medical-primary/90 text-white animate-pulse'
+                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                                 }`}
                         >
                             {pledging ? 'Pledging...' : isEligible ? 'Pledge Now' : 'Incompatible Blood'}
