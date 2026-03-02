@@ -31,6 +31,7 @@ const Navbar = () => {
                                         <>
                                             <Link to="/donor/dashboard" className="text-gray-600 hover:text-medical-primary font-medium">Dashboard</Link>
                                             <Link to="/donor/my-pledges" className="text-gray-600 hover:text-medical-primary font-medium">My Pledges</Link>
+                                            <Link to="/donor/leaderboard" className="text-gray-600 hover:text-medical-primary font-medium">Leaderboard</Link>
                                             <Link to="/donor/profile" className="text-gray-600 hover:text-medical-primary font-medium">Profile</Link>
                                         </>
                                     )}
@@ -88,6 +89,7 @@ const Navbar = () => {
                             <>
                                 <Link to="/donor/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-xl font-medium">Dashboard</Link>
                                 <Link to="/donor/my-pledges" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-xl font-medium">My Pledges</Link>
+                                <Link to="/donor/leaderboard" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-xl font-medium">Leaderboard</Link>
                                 <Link to="/donor/profile" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-xl font-medium">Profile</Link>
                             </>
                         )}

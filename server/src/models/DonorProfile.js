@@ -7,6 +7,12 @@ const donorProfileSchema = new mongoose.Schema({
     pincode: { type: String, required: true },
     lastDonationDate: { type: Date },
     isAvailable: { type: Boolean, default: true },
+    donationCount: { type: Number, default: 0 },
+    points: { type: Number, default: 0 },
+    badges: [{
+        name: { type: String },
+        awardedAt: { type: Date, default: Date.now }
+    }],
     location: {
         lat: { type: Number },
         lng: { type: Number }

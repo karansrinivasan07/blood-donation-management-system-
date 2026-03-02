@@ -126,9 +126,17 @@ exports.updatePledgeStatus = async (req, res) => {
             const donorProfile = await DonorProfile.findOne({ userId: pledge.donorId });
             if (donorProfile) {
                 donorProfile.lastDonationDate = new Date();
+                // Badge & Point Logic
                 donorProfile.donationCount = (donorProfile.donationCount || 0) + 1;
 
-                // Badge Logic
+                // Calculate points: 100 base + urgency bonus
+                let pointsEarned = 100;
+                const request = await BloodRequest.findById(pledge.requestId);
+                if (request && (request.urgency === 'URGENT' || request.urgency === 'CRITICAL')) {
+                    pointsEarned += 50;
+                }
+                donorProfile.points = (donorProfile.points || 0) + pointsEarned;
+
                 const badges = donorProfile.badges || [];
                 const badgeNames = badges.map(b => b.name);
 
@@ -239,6 +247,13 @@ exports.completePledgeDirectly = async (req, res) => {
         if (donorProfile) {
             donorProfile.lastDonationDate = new Date();
             donorProfile.donationCount = (donorProfile.donationCount || 0) + 1;
+
+            // Calculate points: 100 base + urgency bonus
+            let pointsEarned = 100;
+            if (pledge.requestId && (pledge.requestId.urgency === 'URGENT' || pledge.requestId.urgency === 'CRITICAL')) {
+                pointsEarned += 50;
+            }
+            donorProfile.points = (donorProfile.points || 0) + pointsEarned;
 
             // Badge Logic
             const badges = donorProfile.badges || [];

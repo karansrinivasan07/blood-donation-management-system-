@@ -25,6 +25,7 @@ const DonorDashboard = lazyWithRetry(() => import('./pages/donor/Dashboard'));
 const DonorProfile = lazyWithRetry(() => import('./pages/donor/Profile'));
 const MyPledges = lazyWithRetry(() => import('./pages/donor/MyPledges'));
 const RequestDetails = lazyWithRetry(() => import('./pages/donor/RequestDetails'));
+const Leaderboard = lazyWithRetry(() => import('./pages/donor/Leaderboard'));
 const HospitalDashboard = lazyWithRetry(() => import('./pages/hospital/Dashboard'));
 const CreateRequest = lazyWithRetry(() => import('./pages/hospital/CreateRequest'));
 const HospitalRequestDetails = lazyWithRetry(() => import('./pages/hospital/RequestDetails'));
@@ -52,6 +53,7 @@ const App = () => {
                                     <Route path="/donor/dashboard" element={<DonorDashboard />} />
                                     <Route path="/donor/profile" element={<DonorProfile />} />
                                     <Route path="/donor/my-pledges" element={<MyPledges />} />
+                                    <Route path="/donor/leaderboard" element={<Leaderboard />} />
                                     <Route path="/donor/requests/:id" element={<RequestDetails />} />
                                 </Route>
 

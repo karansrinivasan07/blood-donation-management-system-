@@ -96,3 +96,15 @@ exports.pledgeToDonate = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
+
+exports.getLeaderboard = async (req, res) => {
+    try {
+        const leaders = await DonorProfile.find()
+            .populate('userId', 'name')
+            .sort({ points: -1 })
+            .limit(10);
+        res.json(leaders);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};

@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
-import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode } from 'lucide-react';
+import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode, Trophy, Award } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
     const [requests, setRequests] = useState([]);
+    const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
     const [showScanner, setShowScanner] = useState(false);
 
     useEffect(() => {
         fetchRequests();
+        fetchProfile();
     }, [filters]);
+
+    const fetchProfile = async () => {
+        try {
+            const { data } = await api.get('/donor/profile');
+            setProfile(data);
+        } catch (err) {
+            console.error('Failed to fetch profile', err);
+        }
+    };
 
     const fetchRequests = async () => {
         try {
@@ -67,6 +78,42 @@ const Dashboard = () => {
                     </p>
                 </div>
             </div>
+
+            {/* IMPACT STATS */}
+            {profile && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="glass-card p-6 bg-gradient-to-br from-white to-medical-primary/5 border-l-4 border-medical-primary">
+                        <div className="text-medical-primary mb-2">
+                            <Activity size={24} />
+                        </div>
+                        <div className="text-3xl font-black text-medical-dark">{profile.points || 0}</div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Impact Points</div>
+                    </div>
+                    <div className="glass-card p-6 bg-gradient-to-br from-white to-yellow-500/5 border-l-4 border-yellow-500">
+                        <div className="text-yellow-500 mb-2">
+                            <Trophy size={24} />
+                        </div>
+                        <div className="text-3xl font-black text-medical-dark">{profile.donationCount || 0}</div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Lives Saved</div>
+                    </div>
+                    <div className="glass-card p-6 bg-gradient-to-br from-white to-purple-500/5 border-l-4 border-purple-500 col-span-1 md:col-span-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <div className="text-purple-500"><Award size={24} /></div>
+                            <Link to="/donor/leaderboard" className="text-xs font-bold text-purple-600 hover:underline">View Leaderboard</Link>
+                        </div>
+                        <div className="flex gap-2 flex-wrap">
+                            {profile.badges?.length > 0 ? profile.badges.map((badge, idx) => (
+                                <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200">
+                                    {badge.name}
+                                </span>
+                            )) : (
+                                <span className="text-gray-400 text-sm font-medium italic">Make your first donation to earn badges!</span>
+                            )}
+                        </div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mt-2">Achievements Earned</div>
+                    </div>
+                </div>
+            )}
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
                 <div>
