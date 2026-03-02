@@ -33,7 +33,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                 {/* Certificate Content */}
                 <div
                     ref={certificateRef}
-                    className="p-12 border-[16px] border-double border-medical-primary/20 m-4 relative bg-[url('https://www.transparenttextures.com/patterns/white-paper.png')] landscape-certificate"
+                    className="aspect-[1.414/1] w-full border-[16px] border-double border-medical-primary/20 p-8 md:p-12 relative bg-[url('https://www.transparenttextures.com/patterns/white-paper.png')] landscape-certificate overflow-hidden shadow-inner"
                 >
                     {/* Decorative Elements */}
                     <div className="absolute top-0 left-0 w-32 h-32 border-t-8 border-l-8 border-medical-primary rounded-tl-xl opacity-20"></div>
@@ -41,50 +41,48 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                     <div className="absolute bottom-0 left-0 w-32 h-32 border-b-8 border-l-8 border-medical-primary rounded-bl-xl opacity-20"></div>
                     <div className="absolute bottom-0 right-0 w-32 h-32 border-b-8 border-r-8 border-medical-primary rounded-br-xl opacity-20"></div>
 
-                    <div className="text-center space-y-6 py-4">
-                        <div className="flex justify-center mb-2">
+                    <div className="h-full flex flex-col justify-between text-center space-y-4 py-2">
+                        <div className="flex justify-center">
                             <div className="relative">
-                                <Award size={64} className="text-yellow-500" />
-                                <Heart size={20} className="text-medical-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-current" />
+                                <Award size={56} className="text-yellow-500" />
+                                <Heart size={18} className="text-medical-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-current" />
                             </div>
                         </div>
 
                         <header className="space-y-1">
-                            <h1 className="text-4xl font-serif font-black text-medical-dark uppercase tracking-widest">Certificate of Appreciation</h1>
+                            <h1 className="text-3xl md:text-4xl font-serif font-black text-medical-dark uppercase tracking-widest">Certificate of Appreciation</h1>
                             <div className="h-1 w-48 bg-medical-primary mx-auto rounded-full"></div>
-                            <p className="text-lg font-medium text-gray-500 italic">This is to proudly certify that</p>
+                            <p className="text-base md:text-lg font-medium text-gray-500 italic">This is to proudly certify that</p>
                         </header>
 
-                        <div className="py-4">
-                            <h2 className="text-5xl font-bold text-medical-primary underline decoration-dotted decoration-medical-primary/30 underline-offset-8">
+                        <div className="py-2">
+                            <h2 className="text-4xl md:text-5xl font-bold text-medical-primary underline decoration-dotted decoration-medical-primary/30 underline-offset-8">
                                 {donorName}
                             </h2>
                         </div>
 
-                        <p className="max-w-3xl mx-auto text-lg leading-relaxed text-gray-600">
+                        <p className="max-w-3xl mx-auto text-base md:text-lg leading-relaxed text-gray-600 px-4">
                             has selflessly contributed to saving lives by donating <span className="font-bold text-medical-dark">Blood Group {bloodGroup}</span>.
                             Your heroic act provides hope and a second chance at life for those in need.
                         </p>
 
-                        <div className="grid grid-cols-2 gap-20 mt-12 pt-8 border-t border-gray-100">
-                            <div className="text-left space-y-4">
-                                <div className="flex items-center gap-3 text-gray-500 font-bold uppercase tracking-widest text-xs">
-                                    <MapPin size={16} className="text-medical-primary" />
+                        <div className="grid grid-cols-2 gap-10 mt-6 pt-6 border-t border-gray-100">
+                            <div className="text-left space-y-2">
+                                <div className="flex items-center gap-3 text-gray-500 font-bold uppercase tracking-widest text-[10px]">
+                                    <MapPin size={14} className="text-medical-primary" />
                                     Donated At
                                 </div>
-                                <p className="text-xl font-bold text-medical-dark">{hospitalName}</p>
-                                <div className="mt-12">
-                                    <div className="h-0.5 w-48 bg-gray-200"></div>
-                                    <p className="text-xs text-gray-400 font-bold uppercase mt-2">Authorized Signature</p>
-                                    <div className="mt-4 flex justify-center">
-                                        <div className="relative group">
+                                <p className="text-lg font-bold text-medical-dark leading-tight">{hospitalName}</p>
+                                <div className="mt-6 flex flex-col">
+                                    <div className="h-px w-40 bg-gray-300"></div>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase mt-2">Authorized Signature</p>
+                                    <div className="mt-2 text-left">
+                                        <div className="relative inline-block">
                                             <img
-                                                src="/assets/tn_seal.png"
+                                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Seal_of_Tamil_Nadu.svg/512px-Seal_of_Tamil_Nadu.svg.png"
                                                 alt="Authorized Seal"
-                                                className="h-32 w-32 object-contain filter drop-shadow-md"
-                                                onError={(e) => {
-                                                    e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Seal_of_Tamil_Nadu.svg/512px-Seal_of_Tamil_Nadu.svg.png";
-                                                }}
+                                                className="h-20 w-20 object-contain filter drop-shadow hover:scale-110 transition-transform cursor-pointer"
+                                                onClick={() => window.open(src, '_blank')}
                                             />
                                         </div>
                                     </div>
@@ -92,22 +90,22 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                             </div>
 
                             <div className="text-right space-y-4">
-                                <div className="flex items-center justify-end gap-3 text-gray-500 font-bold uppercase tracking-widest text-xs">
-                                    <Calendar size={16} className="text-medical-primary" />
+                                <div className="flex items-center justify-end gap-3 text-gray-500 font-bold uppercase tracking-widest text-[10px]">
+                                    <Calendar size={14} className="text-medical-primary" />
                                     Date of Donation
                                 </div>
-                                <p className="text-xl font-bold text-medical-dark">{new Date(date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
-                                <div className="flex justify-end pt-4">
+                                <p className="text-lg font-bold text-medical-dark">{new Date(date).toLocaleDateString(undefined, { dateStyle: 'long' })}</p>
+                                <div className="flex justify-end pt-2">
                                     <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full border border-green-100 shadow-sm">
-                                        <ShieldCheck size={20} />
-                                        <span className="font-black text-[10px] uppercase tracking-widest">Verified Lifesaver</span>
+                                        <ShieldCheck size={18} />
+                                        <span className="font-black text-[9px] uppercase tracking-widest">Verified Lifesaver</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <footer className="pt-8">
-                            <p className="text-xs text-gray-400 font-medium">"Bringing the gift of life to another is the highest service any human can perform."</p>
+                        <footer className="pt-4">
+                            <p className="text-[10px] text-gray-400 font-medium italic">"Bringing the gift of life to another is the highest service any human can perform."</p>
                         </footer>
                     </div>
                 </div>
@@ -121,6 +119,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                     }
                     html, body {
                         height: 100%;
+                        width: 100%;
                         margin: 0 !important;
                         padding: 0 !important;
                         overflow: hidden;
@@ -132,20 +131,21 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                         visibility: visible;
                     }
                     .fixed {
-                        position: fixed;
-                        left: 0;
-                        top: 0;
-                        width: 100vw;
-                        height: 100vh;
+                        position: fixed !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
                         background: white !important;
                         padding: 0 !important;
                         margin: 0 !important;
                         display: flex !important;
                         align-items: center;
                         justify-content: center;
+                        z-index: 9999;
                     }
                     .max-w-5xl {
-                        max-width: 100% !important;
+                        max-width: none !important;
                         width: 100vw !important;
                         height: 100vh !important;
                         margin: 0 !important;
@@ -155,12 +155,11 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                     .landscape-certificate {
                         height: 100vh !important;
                         width: 100vw !important;
+                        aspect-ratio: auto !important;
                         margin: 0 !important;
-                        border: 20px double rgba(var(--medical-primary-rgb), 0.2) !important;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        padding: 40px !important;
+                        padding: 60px !important;
+                        border: 30px double rgba(0, 0, 0, 0.05) !important;
+                        background-image: none !important;
                     }
                     .print\\:hidden {
                         display: none !important;
