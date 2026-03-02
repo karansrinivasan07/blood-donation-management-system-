@@ -153,6 +153,20 @@ exports.updatePledgeStatus = async (req, res) => {
 
                 donorProfile.badges = badges;
                 await donorProfile.save();
+
+                // Notify donor that donation is completed and certificate is ready
+                try {
+                    const request = await BloodRequest.findById(pledge.requestId).populate('hospitalProfile');
+                    await Notification.create({
+                        recipient: pledge.donorId,
+                        title: 'Donation Completed! 🌟',
+                        message: `Thank you for your life-saving donation at ${request.hospitalProfile?.hospitalName || 'our center'}. Your certificate is now available in "My Pledges"!`,
+                        type: 'DONATION_COMPLETED',
+                        link: '/donor/my-pledges'
+                    });
+                } catch (notifyErr) {
+                    console.error('Failed to send completion notification:', notifyErr);
+                }
             }
         }
 
@@ -307,6 +321,19 @@ exports.completePledgeDirectly = async (req, res) => {
 
             donorProfile.badges = badges;
             await donorProfile.save();
+
+            // Notify donor that donation is completed and certificate is ready
+            try {
+                await Notification.create({
+                    recipient: pledge.donorId,
+                    title: 'Donation Completed! 🌟',
+                    message: `Thank you for your life-saving donation at ${pledge.requestId.hospitalProfile?.hospitalName || 'our center'}. Your certificate is now available in "My Pledges"!`,
+                    type: 'DONATION_COMPLETED',
+                    link: '/donor/my-pledges'
+                });
+            } catch (notifyErr) {
+                console.error('Failed to send completion notification:', notifyErr);
+            }
         }
 
         await pledge.save();

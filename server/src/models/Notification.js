@@ -4,7 +4,7 @@ const notificationSchema = new mongoose.Schema({
     recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String, required: true },
     message: { type: String, required: true },
-    type: { type: String, enum: ['PLEDGE_ACCEPTED', 'DONATION_USED', 'POINTS_EARNED', 'SYSTEM'], default: 'SYSTEM' },
+    type: { type: String, enum: ['PLEDGE_ACCEPTED', 'DONATION_COMPLETED', 'DONATION_USED', 'POINTS_EARNED', 'SYSTEM'], default: 'SYSTEM' },
     isRead: { type: Boolean, default: false },
     link: { type: String },
     createdAt: { type: Date, default: Date.now }
