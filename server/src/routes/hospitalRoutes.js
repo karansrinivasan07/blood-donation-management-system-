@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 router.get('/profile', auth(['HOSPITAL']), hospitalController.getProfile);
 router.put('/profile', auth(['HOSPITAL']), hospitalController.updateProfile);
 router.get('/requests', auth(['HOSPITAL']), hospitalController.getHospitalRequests);
+router.post('/requests', auth(['HOSPITAL']), hospitalController.createRequest);
 router.get('/requests/:id/pledges', auth(['HOSPITAL']), hospitalController.getRequestPledges);
 router.get('/pledges/completed', auth(['HOSPITAL']), hospitalController.getCompletedPledges);
 router.patch('/pledges/:id/mark-used', auth(['HOSPITAL']), hospitalController.markUnitAsUsed);
