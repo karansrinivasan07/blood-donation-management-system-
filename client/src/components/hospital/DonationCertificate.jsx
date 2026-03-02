@@ -74,12 +74,17 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                                 <div className="mt-12">
                                     <div className="h-0.5 w-48 bg-gray-200"></div>
                                     <p className="text-xs text-gray-400 font-bold uppercase mt-2">Authorized Signature</p>
-                                    <div className="mt-4">
-                                        <img
-                                            src="/assets/tn_seal.png"
-                                            alt="Authorized Seal"
-                                            className="h-32 w-32 object-contain"
-                                        />
+                                    <div className="mt-4 flex justify-center">
+                                        <div className="relative group">
+                                            <img
+                                                src="/assets/tn_seal.png"
+                                                alt="Authorized Seal"
+                                                className="h-32 w-32 object-contain filter drop-shadow-md"
+                                                onError={(e) => {
+                                                    e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Seal_of_Tamil_Nadu.svg/512px-Seal_of_Tamil_Nadu.svg.png";
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
