@@ -76,9 +76,9 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                                     <p className="text-xs text-gray-400 font-bold uppercase mt-2">Authorized Signature</p>
                                     <div className="mt-4">
                                         <img
-                                            src="/assets/tn_seal.png"
+                                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Seal_of_Tamil_Nadu.svg/1200px-Seal_of_Tamil_Nadu.svg.png"
                                             alt="Authorized Seal"
-                                            className="h-32 w-32 object-contain"
+                                            className="h-32 w-32 object-contain mix-blend-multiply"
                                         />
                                     </div>
                                 </div>
