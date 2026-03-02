@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { X, QrCode, Camera, SwitchCamera, Loader2, RefreshCw } from 'lucide-react';
+import { X, QrCode, Camera, SwitchCamera, Loader2, RefreshCw, Image as ImageIcon, Upload } from 'lucide-react';
 
 /**
  * Premium QRScanner Component - Fixed for reliability
@@ -11,6 +11,8 @@ const QRScanner = ({ onScan, onClose, title = "Scan QR Code", description = "Pla
     const [isScanning, setIsScanning] = useState(false);
     const [error, setError] = useState(null);
     const [isInitializing, setIsInitializing] = useState(true);
+    const [isFileScanning, setIsFileScanning] = useState(false);
+    const fileInputRef = useRef(null);
 
     const scannerRef = useRef(null);
     const containerRef = useRef(null);
@@ -137,6 +139,28 @@ const QRScanner = ({ onScan, onClose, title = "Scan QR Code", description = "Pla
         setActiveCameraId(cameras[nextIndex].id);
     };
 
+    const handleFileScan = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsFileScanning(true);
+        setError(null);
+
+        try {
+            // We use a temporary instance of Html5Qrcode for file scanning
+            const html5QrCode = new Html5Qrcode("reader");
+            const result = await html5QrCode.scanFile(file, false);
+            onScan(result);
+        } catch (err) {
+            console.error("File scan failed", err);
+            setError("Could not find a valid QR code in this image. Please ensure the code is clear.");
+        } finally {
+            setIsFileScanning(false);
+            // Reset input
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-500">
             <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.6)] border border-white/5 animate-in fade-in zoom-in slide-in-from-bottom-10 duration-500">
@@ -220,18 +244,39 @@ const QRScanner = ({ onScan, onClose, title = "Scan QR Code", description = "Pla
                             </p>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap gap-3">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileScan}
+                                accept="image/*"
+                                className="hidden"
+                            />
+
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isFileScanning}
+                                className="flex-1 min-w-[140px] py-4 bg-medical-secondary/10 hover:bg-medical-secondary/20 text-medical-secondary rounded-2xl transition-all flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-tight"
+                            >
+                                {isFileScanning ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                ) : (
+                                    <ImageIcon size={18} />
+                                )}
+                                {isFileScanning ? 'Scanning...' : 'From Gallery'}
+                            </button>
+
                             {cameras.length > 1 && (
                                 <button
                                     onClick={toggleCamera}
-                                    className="flex-1 py-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-2xl transition-all flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-tight text-gray-700 dark:text-gray-300"
+                                    className="flex-1 min-w-[100px] py-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-2xl transition-all flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-tight text-gray-700 dark:text-gray-300"
                                 >
-                                    <SwitchCamera size={18} /> Switch Cam
+                                    <SwitchCamera size={18} /> Switch
                                 </button>
                             )}
                             <button
                                 onClick={onClose}
-                                className={`py-4 px-8 bg-medical-primary/10 hover:bg-medical-primary/20 text-medical-primary rounded-2xl transition-all flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-tight ${cameras.length <= 1 ? 'w-full' : 'flex-1'}`}
+                                className="py-4 px-8 bg-medical-primary/10 hover:bg-medical-primary/20 text-medical-primary rounded-2xl transition-all flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-tight"
                             >
                                 <X size={18} /> Close
                             </button>
