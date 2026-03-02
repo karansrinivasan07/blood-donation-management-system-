@@ -10,7 +10,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
 
     return (
         <div className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 print:p-0 print:bg-white">
-            <div className="max-w-4xl w-full bg-white relative overflow-hidden print:shadow-none shadow-2xl rounded-3xl print:rounded-none">
+            <div className="max-w-5xl w-full bg-white relative overflow-hidden print:shadow-none shadow-2xl rounded-3xl print:rounded-none">
 
                 {/* Print Controls - Hidden during print */}
                 <div className="absolute top-6 right-6 flex gap-3 print:hidden z-20">
@@ -31,7 +31,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                 {/* Certificate Content */}
                 <div
                     ref={certificateRef}
-                    className="p-16 border-[16px] border-double border-medical-primary/20 m-4 relative bg-[url('https://www.transparenttextures.com/patterns/white-paper.png')]"
+                    className="p-12 border-[16px] border-double border-medical-primary/20 m-4 relative bg-[url('https://www.transparenttextures.com/patterns/white-paper.png')] landscape-certificate"
                 >
                     {/* Decorative Elements */}
                     <div className="absolute top-0 left-0 w-32 h-32 border-t-8 border-l-8 border-medical-primary rounded-tl-xl opacity-20"></div>
@@ -39,40 +39,47 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                     <div className="absolute bottom-0 left-0 w-32 h-32 border-b-8 border-l-8 border-medical-primary rounded-bl-xl opacity-20"></div>
                     <div className="absolute bottom-0 right-0 w-32 h-32 border-b-8 border-r-8 border-medical-primary rounded-br-xl opacity-20"></div>
 
-                    <div className="text-center space-y-8 py-10">
-                        <div className="flex justify-center mb-6">
+                    <div className="text-center space-y-6 py-4">
+                        <div className="flex justify-center mb-2">
                             <div className="relative">
-                                <Award size={80} className="text-yellow-500" />
-                                <Heart size={24} className="text-medical-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-current" />
+                                <Award size={64} className="text-yellow-500" />
+                                <Heart size={20} className="text-medical-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-current" />
                             </div>
                         </div>
 
-                        <header className="space-y-2">
-                            <h1 className="text-5xl font-serif font-black text-medical-dark uppercase tracking-widest">Certificate of Appreciation</h1>
+                        <header className="space-y-1">
+                            <h1 className="text-4xl font-serif font-black text-medical-dark uppercase tracking-widest">Certificate of Appreciation</h1>
                             <div className="h-1 w-48 bg-medical-primary mx-auto rounded-full"></div>
-                            <p className="text-xl font-medium text-gray-500 italic">This is to proudly certify that</p>
+                            <p className="text-lg font-medium text-gray-500 italic">This is to proudly certify that</p>
                         </header>
 
-                        <div className="py-6">
-                            <h2 className="text-6xl font-bold text-medical-primary underline decoration-dotted decoration-medical-primary/30 underline-offset-8">
+                        <div className="py-4">
+                            <h2 className="text-5xl font-bold text-medical-primary underline decoration-dotted decoration-medical-primary/30 underline-offset-8">
                                 {donorName}
                             </h2>
                         </div>
 
-                        <p className="max-w-2xl mx-auto text-lg leading-relaxed text-gray-600">
+                        <p className="max-w-3xl mx-auto text-lg leading-relaxed text-gray-600">
                             has selflessly contributed to saving lives by donating <span className="font-bold text-medical-dark">Blood Group {bloodGroup}</span>.
                             Your heroic act provides hope and a second chance at life for those in need.
                         </p>
 
-                        <div className="grid grid-cols-2 gap-12 mt-16 pt-12 border-t border-gray-100">
+                        <div className="grid grid-cols-2 gap-20 mt-12 pt-8 border-t border-gray-100">
                             <div className="text-left space-y-4">
                                 <div className="flex items-center gap-3 text-gray-500 font-bold uppercase tracking-widest text-xs">
                                     <MapPin size={16} className="text-medical-primary" />
                                     Donated At
                                 </div>
                                 <p className="text-xl font-bold text-medical-dark">{hospitalName}</p>
-                                <div className="h-0.5 w-full bg-gray-200 mt-8"></div>
-                                <p className="text-xs text-gray-400 font-bold uppercase">Authorized Signature</p>
+                                <div className="mt-8 relative h-16 flex flex-col justify-end">
+                                    <div className="h-0.5 w-full bg-gray-200"></div>
+                                    <p className="text-xs text-gray-400 font-bold uppercase mt-2">Authorized Signature</p>
+                                    <img
+                                        src="/assets/tn_seal.png"
+                                        alt="Authorized Seal"
+                                        className="absolute -top-12 left-0 h-24 w-24 object-contain opacity-80"
+                                    />
+                                </div>
                             </div>
 
                             <div className="text-right space-y-4">
@@ -90,7 +97,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                             </div>
                         </div>
 
-                        <footer className="pt-12">
+                        <footer className="pt-8">
                             <p className="text-xs text-gray-400 font-medium">"Bringing the gift of life to another is the highest service any human can perform."</p>
                         </footer>
                     </div>
@@ -99,6 +106,10 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
 
             <style>{`
                 @media print {
+                    @page {
+                        size: landscape;
+                        margin: 0;
+                    }
                     body * {
                         visibility: hidden;
                     }
@@ -106,12 +117,30 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                         visibility: visible;
                     }
                     .fixed {
-                        position: absolute;
+                        position: fixed;
                         left: 0;
                         top: 0;
-                        width: 100%;
-                        height: 100%;
+                        width: 100vw;
+                        height: 100vh;
                         background: white !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .max-w-4xl {
+                        max-width: 100% !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        margin: 0 !important;
+                    }
+                    .landscape-certificate {
+                        height: calc(100vh - 40px);
+                        margin: 20px !important;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
                     }
                     .print\\:hidden {
                         display: none !important;
