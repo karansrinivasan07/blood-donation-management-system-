@@ -136,7 +136,7 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                         align-items: center;
                         justify-content: center;
                     }
-                    .max-w-4xl {
+                    .max-w-5xl {
                         max-width: 100% !important;
                         width: 100% !important;
                         height: 100% !important;
