@@ -2,6 +2,7 @@ const HospitalProfile = require('../models/HospitalProfile');
 const BloodRequest = require('../models/BloodRequest');
 const Pledge = require('../models/Pledge');
 const DonorProfile = require('../models/DonorProfile');
+const Notification = require('../models/Notification');
 
 exports.getProfile = async (req, res) => {
     try {
@@ -157,6 +158,22 @@ exports.updatePledgeStatus = async (req, res) => {
 
         await pledge.save();
 
+        // Notify donor if pledge is confirmed
+        if (status === 'CONFIRMED') {
+            try {
+                const request = await BloodRequest.findById(pledge.requestId).populate('hospitalProfile');
+                await Notification.create({
+                    recipient: pledge.donorId,
+                    title: 'Pledge Accepted! 🩸',
+                    message: `Great news! ${request.hospitalProfile?.hospitalName || 'The hospital'} has accepted your pledge for ${request.bloodGroup} blood. Please check your appointment time.`,
+                    type: 'PLEDGE_ACCEPTED',
+                    link: '/donor/my-pledges'
+                });
+            } catch (notifyErr) {
+                console.error('Failed to send confirmation notification:', notifyErr);
+            }
+        }
+
         // 3. Auto-close request if fully fulfilled
         if (status === 'COMPLETED') {
             const request = await BloodRequest.findById(pledge.requestId);
@@ -225,7 +242,20 @@ exports.markUnitAsUsed = async (req, res) => {
         pledge.usedAt = new Date();
         await pledge.save();
 
-        // Emit Socket Notification to Donor
+        // Create notification for donor
+        try {
+            await Notification.create({
+                recipient: pledge.donorId._id,
+                title: 'Your Gift Saved a Life! ❤️',
+                message: `Amazing news! Your blood donation to ${pledge.requestId.hospitalProfile?.hospitalName || 'our center'} was used to help a patient today. You are a true life-saver!`,
+                type: 'DONATION_USED',
+                link: '/donor/my-pledges'
+            });
+        } catch (notifyErr) {
+            console.error('Failed to save donation-used notification:', notifyErr);
+        }
+
+        // Emit Socket Notification to Donor (Keeping for real-time if io is restored later)
         const io = req.app.get('socketio');
         if (io) {
             io.to(pledge.donorId._id.toString()).emit('notification', {

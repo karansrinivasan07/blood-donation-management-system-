@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Droplet, User, LogOut, LayoutDashboard, HeartPulse, Menu, X } from 'lucide-react';
+import NotificationBell from './donor/NotificationBell';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -50,6 +51,7 @@ const Navbar = () => {
                                     )}
 
                                     <div className="flex items-center gap-4 border-l pl-6 ml-2">
+                                        {user.role === 'DONOR' && <NotificationBell />}
                                         <span className="text-sm font-semibold text-gray-700">{user.name}</span>
                                         <button
                                             onClick={handleLogout}

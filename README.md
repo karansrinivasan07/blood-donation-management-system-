@@ -6,9 +6,12 @@ A full-stack MERN application connecting blood donors with hospitals in real-tim
 
 - **Role-based Authentication**: Secure JWT-based login for Donors, Hospitals, and Admins.
 - **Donor Portal**: Browse nearby requests, pledge donations, manage eligibility (90-day cooldown).
-- **Hospital Portal**: Post blood requests, manage donor pledges, schedule appointments.
+- **Advanced QR Scanner**: Live camera scanning + "Scan from Gallery" for QR codes received as images.
+- **Notification System**: Real-time alerts for donors when pledges are accepted or donations are used.
+- **Donation Certificates**: Automatic generation of digital appreciation certificates for donors.
+- **Hospital Portal**: Post blood requests, manage donor pledges, and auto-closing of requests upon fulfillment.
 - **Admin Dashboard**: System-wide analytics, user management (block/activate).
-- **Modern UI**: Clean, medical-themed interface using Tailwind CSS and Framer Motion.
+- **Modern UI**: Clean, medical-themed interface using Tailwind CSS, Lucide Icons, and Framer Motion.
 
 ## Tech Stack
 

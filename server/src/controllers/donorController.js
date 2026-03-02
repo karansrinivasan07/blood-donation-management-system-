@@ -1,6 +1,7 @@
 const DonorProfile = require('../models/DonorProfile');
 const Pledge = require('../models/Pledge');
 const BloodRequest = require('../models/BloodRequest');
+const Notification = require('../models/Notification');
 
 exports.getProfile = async (req, res) => {
     try {
@@ -104,6 +105,33 @@ exports.getLeaderboard = async (req, res) => {
             .sort({ points: -1 })
             .limit(10);
         res.json(leaders);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.getNotifications = async (req, res) => {
+    try {
+        const notifications = await Notification.find({ recipient: req.user.id })
+            .sort({ createdAt: -1 })
+            .limit(20);
+        res.json(notifications);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.markNotificationRead = async (req, res) => {
+    try {
+        const notification = await Notification.findOne({
+            _id: req.params.id,
+            recipient: req.user.id
+        });
+        if (!notification) return res.status(404).json({ message: 'Notification not found' });
+
+        notification.isRead = true;
+        await notification.save();
+        res.json(notification);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
