@@ -156,6 +156,19 @@ exports.updatePledgeStatus = async (req, res) => {
         }
 
         await pledge.save();
+
+        // 3. Auto-close request if fully fulfilled
+        if (status === 'COMPLETED') {
+            const request = await BloodRequest.findById(pledge.requestId);
+            if (request) {
+                const completedCount = await Pledge.countDocuments({ requestId: request._id, status: 'COMPLETED' });
+                if (completedCount >= request.unitsRequired) {
+                    request.status = 'CLOSED';
+                    await request.save();
+                }
+            }
+        }
+
         res.json(pledge);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
@@ -267,6 +280,17 @@ exports.completePledgeDirectly = async (req, res) => {
         }
 
         await pledge.save();
+
+        // Auto-close request if fully fulfilled
+        const request = await BloodRequest.findById(pledge.requestId);
+        if (request) {
+            const completedCount = await Pledge.countDocuments({ requestId: request._id, status: 'COMPLETED' });
+            if (completedCount >= request.unitsRequired) {
+                request.status = 'CLOSED';
+                await request.save();
+            }
+        }
+
         res.json({ message: 'Donation completed successfully', pledge });
     } catch (err) {
         console.error('completePledgeDirectly Error:', err);

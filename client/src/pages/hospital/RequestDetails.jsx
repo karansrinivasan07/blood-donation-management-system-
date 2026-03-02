@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { User, Phone, CheckCircle2, XCircle, Calendar, Clock, ChevronLeft, MapPin, QrCode, ExternalLink, Download } from 'lucide-react';
+import { User, Phone, CheckCircle2, XCircle, Calendar, Clock, ChevronLeft, MapPin, QrCode, ExternalLink, Download, FileText } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import DonationCertificate from '../../components/hospital/DonationCertificate';
 
 const RequestDetails = () => {
     const { id } = useParams();
@@ -12,6 +13,7 @@ const RequestDetails = () => {
     const [pledges, setPledges] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedPledge, setSelectedPledge] = useState(null);
+    const [certificateData, setCertificateData] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -171,12 +173,27 @@ const RequestDetails = () => {
                                         >
                                             <QrCode size={12} /> Show Donor QR & Location
                                         </button>
+
                                         {pledge.donorProfile?.location?.lat && (
                                             <button
                                                 onClick={() => window.open(`https://www.google.com/maps?q=${pledge.donorProfile.location.lat},${pledge.donorProfile.location.lng}`, '_blank')}
                                                 className="text-[10px] bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-100 transition-all border border-blue-100"
                                             >
                                                 <ExternalLink size={12} /> Open Maps
+                                            </button>
+                                        )}
+
+                                        {pledge.status === 'COMPLETED' && (
+                                            <button
+                                                onClick={() => setCertificateData({
+                                                    donorName: pledge.donorId?.name,
+                                                    bloodGroup: pledge.donorProfile?.bloodGroup,
+                                                    hospitalName: request.hospitalProfile?.hospitalName || 'City Hospital',
+                                                    date: pledge.completedAt || new Date()
+                                                })}
+                                                className="text-[10px] bg-green-50 text-green-600 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-green-100 transition-all border border-green-100"
+                                            >
+                                                <FileText size={12} /> Generate Certificate
                                             </button>
                                         )}
                                     </div>
@@ -297,6 +314,13 @@ const RequestDetails = () => {
                         </div>
                     </div>
                 </div>
+            )}
+            {/* Certificate Modal */}
+            {certificateData && (
+                <DonationCertificate
+                    {...certificateData}
+                    onClose={() => setCertificateData(null)}
+                />
             )}
         </div>
     );

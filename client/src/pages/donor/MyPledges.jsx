@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Calendar, MapPin, Building2, CheckCircle2, Clock, XCircle, QrCode, Download } from 'lucide-react';
+import { Calendar, MapPin, Building2, CheckCircle2, Clock, XCircle, QrCode, Download, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { QRCodeSVG } from 'qrcode.react';
+import DonationCertificate from '../../components/hospital/DonationCertificate';
 
 const MyPledges = () => {
     const { user, profile } = useAuth();
     const [pledges, setPledges] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [certificateData, setCertificateData] = useState(null);
 
     useEffect(() => {
         fetchPledges();
@@ -110,6 +112,19 @@ const MyPledges = () => {
                                         {getStatusIcon(pledge.status)}
                                         {pledge.status}
                                     </div>
+                                    {pledge.status === 'COMPLETED' && (
+                                        <button
+                                            onClick={() => setCertificateData({
+                                                donorName: user?.name,
+                                                bloodGroup: pledge.requestId.bloodGroup,
+                                                hospitalName: pledge.requestId.hospitalProfile?.hospitalName,
+                                                date: pledge.completedAt || new Date()
+                                            })}
+                                            className="text-[10px] text-green-600 font-black uppercase tracking-widest hover:underline flex items-center gap-1"
+                                        >
+                                            <FileText size={10} /> View Certificate
+                                        </button>
+                                    )}
                                 </div>
 
                                 {pledge.status !== 'CANCELLED' && (
@@ -143,6 +158,12 @@ const MyPledges = () => {
                 <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
                     <p className="text-gray-500">You haven't made any pledges yet.</p>
                 </div>
+            )}
+            {certificateData && (
+                <DonationCertificate
+                    {...certificateData}
+                    onClose={() => setCertificateData(null)}
+                />
             )}
         </div>
     );
