@@ -15,10 +15,12 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                 {/* Print Controls - Hidden during print */}
                 <div className="absolute top-6 right-6 flex gap-3 print:hidden z-20">
                     <button
-                        onClick={handlePrint}
+                        onClick={() => window.print()}
                         className="bg-medical-primary text-white px-6 py-2 rounded-xl font-bold hover:bg-medical-primary/90 transition-all flex items-center gap-2 shadow-lg"
+                        title="Save as PDF or Print"
                     >
-                        Print Certificate
+                        <Award size={18} />
+                        Download / Print
                     </button>
                     <button
                         onClick={onClose}
@@ -117,6 +119,12 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                         size: landscape;
                         margin: 0;
                     }
+                    html, body {
+                        height: 100%;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        overflow: hidden;
+                    }
                     body * {
                         visibility: hidden;
                     }
@@ -138,28 +146,24 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                     }
                     .max-w-5xl {
                         max-width: 100% !important;
-                        width: 100% !important;
-                        height: 100% !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
                         margin: 0 !important;
+                        border-radius: 0 !important;
+                        box-shadow: none !important;
                     }
                     .landscape-certificate {
-                        height: calc(100vh - 40px);
-                        margin: 20px !important;
+                        height: 100vh !important;
+                        width: 100vw !important;
+                        margin: 0 !important;
+                        border: 20px double rgba(var(--medical-primary-rgb), 0.2) !important;
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
+                        padding: 40px !important;
                     }
                     .print\\:hidden {
                         display: none !important;
-                    }
-                    .print\\:shadow-none {
-                        box-shadow: none !important;
-                    }
-                    .print\\:p-0 {
-                        padding: 0 !important;
-                    }
-                    .print\\:rounded-none {
-                        border-radius: 0 !important;
                     }
                 }
             `}</style>
