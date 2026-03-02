@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
-import { Trophy, Medal, Award, Star, TrendingUp, Users } from 'lucide-react';
+import { Trophy, Medal, Award, Star, TrendingUp, Users, Droplets, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 
@@ -73,8 +73,8 @@ const Leaderboard = () => {
                             key={leader._id}
                             variants={itemVariants}
                             className={`glass-card p-6 flex items-center justify-between hover:scale-[1.02] transition-transform duration-300 ${index === 0 ? 'border-2 border-yellow-400 shadow-yellow-100' :
-                                    index === 1 ? 'border-2 border-slate-300 shadow-slate-100' :
-                                        index === 2 ? 'border-2 border-orange-300 shadow-orange-100' : ''
+                                index === 1 ? 'border-2 border-slate-300 shadow-slate-100' :
+                                    index === 2 ? 'border-2 border-orange-300 shadow-orange-100' : ''
                                 }`}
                         >
                             <div className="flex items-center gap-6">
@@ -94,7 +94,7 @@ const Leaderboard = () => {
 
                             <div className="text-right">
                                 <div className="text-2xl font-black text-medical-primary flex items-center gap-2 justify-end">
-                                    {leader.points.toLocaleString()} <Star size={20} fill="currentColor" />
+                                    {(leader.points || 0).toLocaleString()} <Star size={20} fill="currentColor" />
                                 </div>
                                 <div className="text-xs uppercase tracking-widest font-bold text-gray-400">
                                     Impact Points
