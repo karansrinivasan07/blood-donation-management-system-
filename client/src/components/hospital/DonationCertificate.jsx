@@ -71,14 +71,16 @@ const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClos
                                     Donated At
                                 </div>
                                 <p className="text-xl font-bold text-medical-dark">{hospitalName}</p>
-                                <div className="mt-8 relative h-16 flex flex-col justify-end">
-                                    <div className="h-0.5 w-full bg-gray-200"></div>
+                                <div className="mt-12">
+                                    <div className="h-0.5 w-48 bg-gray-200"></div>
                                     <p className="text-xs text-gray-400 font-bold uppercase mt-2">Authorized Signature</p>
-                                    <img
-                                        src="/assets/tn_seal.png"
-                                        alt="Authorized Seal"
-                                        className="absolute -top-12 left-0 h-24 w-24 object-contain opacity-80"
-                                    />
+                                    <div className="mt-4">
+                                        <img
+                                            src="/assets/tn_seal.png"
+                                            alt="Authorized Seal"
+                                            className="h-32 w-32 object-contain"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
