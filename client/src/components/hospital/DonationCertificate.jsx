@@ -1,26 +1,71 @@
-import React, { useRef } from 'react';
-import { Award, Heart, CheckCircle2, ShieldCheck, Calendar, MapPin } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Award, Heart, CheckCircle2, ShieldCheck, Calendar, MapPin, Download, Loader2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 const DonationCertificate = ({ donorName, bloodGroup, hospitalName, date, onClose }) => {
     const certificateRef = useRef(null);
 
-    const handlePrint = () => {
-        window.print();
+    const [downloading, setDownloading] = useState(false);
+
+    const handleDownload = async () => {
+        if (!certificateRef.current) return;
+        setDownloading(true);
+        try {
+            const element = certificateRef.current;
+            const canvas = await html2canvas(element, {
+                scale: 3, // High quality
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save(`Donation_Certificate_${donorName.replace(/\s+/g, '_')}.pdf`);
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Failed to download certificate. Please try the Print option.');
+        } finally {
+            setDownloading(false);
+        }
     };
 
     return (
-        <div className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 print:p-0 print:bg-white">
-            <div className="max-w-5xl w-full bg-white relative overflow-hidden print:shadow-none shadow-2xl rounded-3xl print:rounded-none">
+        <div className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 print:p-0 print:bg-white overflow-y-auto">
+            <div className="max-w-5xl w-full bg-white relative overflow-hidden print:shadow-none shadow-2xl rounded-3xl print:rounded-none my-8">
 
                 {/* Print Controls - Hidden during print */}
                 <div className="absolute top-6 right-6 flex gap-3 print:hidden z-20">
                     <button
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="bg-green-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-green-700 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {downloading ? (
+                            <>
+                                <Loader2 size={18} className="animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            <>
+                                <Download size={18} />
+                                Download PDF
+                            </>
+                        )}
+                    </button>
+                    <button
                         onClick={() => window.print()}
                         className="bg-medical-primary text-white px-6 py-2 rounded-xl font-bold hover:bg-medical-primary/90 transition-all flex items-center gap-2 shadow-lg"
-                        title="Save as PDF or Print"
+                        title="Print Certificate"
                     >
-                        <Award size={18} />
-                        Download / Print
+                        Print
                     </button>
                     <button
                         onClick={onClose}
