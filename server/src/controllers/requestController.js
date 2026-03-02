@@ -1,5 +1,6 @@
 const BloodRequest = require('../models/BloodRequest');
 const HospitalProfile = require('../models/HospitalProfile'); // Required for populate
+const DonorProfile = require('../models/DonorProfile');
 const Pledge = require('../models/Pledge'); // Required for counts
 
 exports.getAllRequests = async (req, res) => {
@@ -7,7 +8,16 @@ exports.getAllRequests = async (req, res) => {
         const { bloodGroup, city, status } = req.query;
         let query = {};
 
-        if (bloodGroup) query.bloodGroup = bloodGroup;
+        if (bloodGroup) {
+            query.bloodGroup = bloodGroup;
+        } else if (req.user && req.user.role === 'DONOR') {
+            // Find donor's blood group and filter automatically
+            const donorProfile = await DonorProfile.findOne({ userId: req.user.id });
+            if (donorProfile && donorProfile.bloodGroup) {
+                query.bloodGroup = donorProfile.bloodGroup;
+            }
+        }
+
         if (status && status !== 'ALL') {
             query.status = status;
         } else if (status !== 'ALL') {

@@ -3,28 +3,27 @@ import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode, Trophy, Award } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 import QRScanner from '../../components/QRScanner';
 
 const Dashboard = () => {
+    const { profile } = useAuth();
     const [requests, setRequests] = useState([]);
-    const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState({ city: '', bloodGroup: '' });
+    const [filters, setFilters] = useState({ city: '', bloodGroup: profile?.bloodGroup || '' });
     const [showScanner, setShowScanner] = useState(false);
 
     useEffect(() => {
+        if (profile?.bloodGroup && !filters.bloodGroup) {
+            setFilters(prev => ({ ...prev, bloodGroup: profile.bloodGroup }));
+        }
+    }, [profile]);
+
+    useEffect(() => {
         fetchRequests();
-        fetchProfile();
     }, [filters]);
 
-    const fetchProfile = async () => {
-        try {
-            const { data } = await api.get('/donor/profile');
-            setProfile(data);
-        } catch (err) {
-            console.error('Failed to fetch profile', err);
-        }
-    };
+
 
     const fetchRequests = async () => {
         try {
@@ -118,7 +117,13 @@ const Dashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
                 <div>
                     <h1 className="text-3xl font-bold text-medical-dark">Available Requests</h1>
-                    <p className="text-gray-500 font-medium">Find people who need your help in {filters.city || 'all cities'}</p>
+                    <p className="text-gray-500 font-medium">
+                        {filters.bloodGroup ? (
+                            <>Showing <span className="text-medical-primary font-bold">{filters.bloodGroup}</span> requests in {filters.city || 'all cities'}</>
+                        ) : (
+                            <>Find people who need your help in {filters.city || 'all cities'}</>
+                        )}
+                    </p>
                 </div>
                 <button
                     onClick={() => setShowScanner(true)}
