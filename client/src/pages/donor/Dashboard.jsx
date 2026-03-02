@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
-import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode, Trophy, Award } from 'lucide-react';
+import { Search, MapPin, Droplets, Clock, ChevronRight, Activity, QrCode, Trophy, Award, ExternalLink, Building2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import QRScanner from '../../components/QRScanner';
+import { QRCodeSVG } from 'qrcode.react';
 
 const Dashboard = () => {
     const { profile } = useAuth();
     const [requests, setRequests] = useState([]);
+    const [camps, setCamps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ city: '', bloodGroup: profile?.bloodGroup || '' });
     const [showScanner, setShowScanner] = useState(false);
@@ -21,9 +23,24 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchRequests();
+        fetchCamps();
     }, [filters]);
 
-
+    const fetchCamps = async () => {
+        try {
+            const { data } = await api.get('/donor/active-camps');
+            // Filter by city if filter is active
+            let activeCamps = data;
+            if (filters.city) {
+                activeCamps = data.filter(c =>
+                    (c.campCity || c.city).toLowerCase().includes(filters.city.toLowerCase())
+                );
+            }
+            setCamps(activeCamps);
+        } catch (err) {
+            console.error('Camps fetch error:', err);
+        }
+    };
 
     const fetchRequests = async () => {
         try {
@@ -59,7 +76,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-12">
             {/* HERO SECTION */}
             <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden shadow-2xl group">
                 <img
@@ -114,23 +131,85 @@ const Dashboard = () => {
                 </div>
             )}
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+            {/* ACTIVE CAMPS SECTION */}
+            {camps.length > 0 && (
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-black text-medical-dark uppercase tracking-tight flex items-center gap-2">
+                                <QrCode className="text-medical-secondary" /> Active Donation Camps
+                            </h2>
+                            <p className="text-gray-500 text-sm">Scan or click a QR code below to find your nearest camp site</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {camps.map((camp) => (
+                            <div key={camp._id} className="glass-card p-6 border-t-4 border-medical-secondary bg-white shadow-xl hover:-translate-y-1 transition-all">
+                                <div className="flex flex-col items-center text-center space-y-4">
+                                    <div className="bg-gray-50 p-2 rounded-2xl border border-gray-100 shadow-inner group relative cursor-pointer"
+                                        onClick={() => {
+                                            const mapsUrl = camp.location?.lat
+                                                ? `https://www.google.com/maps/search/?api=1&query=${camp.location.lat},${camp.location.lng}`
+                                                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((camp.campAddress || camp.address) + ' ' + (camp.campCity || camp.city))}`;
+                                            window.open(mapsUrl, '_blank');
+                                        }}
+                                    >
+                                        <QRCodeSVG
+                                            value={JSON.stringify({
+                                                type: 'BLOOD_CAMP',
+                                                name: camp.hospitalName,
+                                                address: camp.campAddress || camp.address,
+                                                city: camp.campCity || camp.city,
+                                                location: camp.location,
+                                                mapsUrl: camp.location?.lat
+                                                    ? `https://www.google.com/maps/search/?api=1&query=${camp.location.lat},${camp.location.lng}`
+                                                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((camp.campAddress || camp.address) + ' ' + (camp.campCity || camp.city))}`
+                                            })}
+                                            size={140}
+                                            level="L"
+                                        />
+                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
+                                            <ExternalLink className="text-medical-secondary bg-white p-1 rounded shadow-sm" size={24} />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold text-medical-dark leading-tight line-clamp-1">{camp.hospitalName}</h4>
+                                        <div className="flex items-center justify-center gap-1 text-[10px] text-gray-400 mt-1 uppercase font-black tracking-widest">
+                                            <MapPin size={10} /> {camp.campCity || camp.city}
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[11px] text-gray-500 font-medium line-clamp-2 italic">
+                                        {camp.campAddress || camp.address}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full pt-8 border-t border-gray-100">
                 <div>
-                    <h1 className="text-3xl font-bold text-medical-dark">Available Requests</h1>
+                    <h1 className="text-3xl font-bold text-medical-dark">Blood Requests</h1>
                     <p className="text-gray-500 font-medium">
                         {filters.bloodGroup ? (
-                            <>Showing <span className="text-medical-primary font-bold">{filters.bloodGroup}</span> requests in {filters.city || 'all cities'}</>
+                            <>Critical <span className="text-medical-primary font-bold">{filters.bloodGroup}</span> responses in {filters.city || 'all cities'}</>
                         ) : (
-                            <>Find people who need your help in {filters.city || 'all cities'}</>
+                            <>Lend a hand in {filters.city || 'all cities'}</>
                         )}
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowScanner(true)}
-                    className="btn-secondary flex items-center gap-2 px-6 py-3"
-                >
-                    <QrCode size={20} /> Scan Camp QR
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowScanner(true)}
+                        className="btn-secondary flex items-center gap-2 px-6 py-3"
+                    >
+                        <QrCode size={20} /> Launch Scanner
+                    </button>
+                </div>
             </div>
 
             <div className="flex gap-4 items-center">

@@ -2,6 +2,16 @@ const DonorProfile = require('../models/DonorProfile');
 const Pledge = require('../models/Pledge');
 const BloodRequest = require('../models/BloodRequest');
 const Notification = require('../models/Notification');
+const HospitalProfile = require('../models/HospitalProfile');
+
+exports.getActiveCamps = async (req, res) => {
+    try {
+        const camps = await HospitalProfile.find({ isCampActive: true });
+        res.json(camps);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 exports.getProfile = async (req, res) => {
     try {
