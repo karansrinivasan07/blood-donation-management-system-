@@ -64,28 +64,28 @@ const Register = () => {
 
                 <div className="grid grid-cols-3 gap-3 mb-8">
                     <button
+                        type="button"
                         onClick={() => setRole('DONOR')}
-                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary' : 'border-gray-100 text-gray-400 grayscale'
-                            }`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
                     >
                         <User size={32} />
-                        <span className="font-bold">I'm a Donor</span>
+                        <span className="text-xs">I'm a Donor</span>
                     </button>
                     <button
+                        type="button"
                         onClick={() => setRole('HOSPITAL')}
-                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary' : 'border-gray-100 text-gray-400 grayscale'
-                            }`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
                     >
                         <Building2 size={32} />
-                        <span className="font-bold">Hospital/Bank</span>
+                        <span className="text-xs">Hospital/Bank</span>
                     </button>
                     <button
+                        type="button"
                         onClick={() => setRole('ADMIN')}
-                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark' : 'border-gray-100 text-gray-400 grayscale'
-                            }`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
                     >
                         <Shield size={32} />
-                        <span className="font-bold">Admin</span>
+                        <span className="text-xs">Admin</span>
                     </button>
                 </div>
 
@@ -189,8 +189,8 @@ const Register = () => {
                             type="submit"
                             disabled={loading}
                             className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white transition-all shadow-lg ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90' :
-                                role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
-                                    'bg-medical-dark hover:bg-medical-dark/90'
+                                    role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
+                                        'bg-medical-dark hover:bg-medical-dark/90'
                                 }`}
                         >
                             {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Create Account'}
