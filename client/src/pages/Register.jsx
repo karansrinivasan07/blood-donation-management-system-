@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
-import { UserPlus, Mail, Lock, User, Phone, MapPin, Building2, Droplets, Shield } from 'lucide-react';
+import { Mail, Lock, User, Phone, MapPin, Building2, Droplets, Shield } from 'lucide-react';
 
 const Register = () => {
     const [role, setRole] = useState('DONOR');
@@ -48,41 +48,44 @@ const Register = () => {
         } catch (err) {
             const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Registration failed';
             toast.error(errorMsg);
-            console.error('Detailed Registration Error:', err.response?.data);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto mt-6">
+        <div className="max-w-2xl mx-auto mt-6 px-4 pb-20">
             <div className="glass-card p-8">
                 <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold">Create Account</h2>
-                    <p className="text-gray-500">Join the movement to save lives</p>
+                    <h2 className="text-3xl font-bold">Join the Movement</h2>
+                    <p className="text-gray-500">Create an account to save lives</p>
                 </div>
 
+                {/* Role Selector */}
                 <div className="grid grid-cols-3 gap-3 mb-8">
                     <button
                         type="button"
                         onClick={() => setRole('DONOR')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                            }`}
                     >
                         <User size={32} />
-                        <span className="text-xs">I'm a Donor</span>
+                        <span className="text-xs">Donor</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('HOSPITAL')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                            }`}
                     >
                         <Building2 size={32} />
-                        <span className="text-xs">Hospital/Bank</span>
+                        <span className="text-xs">Hospital</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('ADMIN')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark font-bold' : 'border-gray-100 text-gray-400 grayscale'}`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                            }`}
                     >
                         <Shield size={32} />
                         <span className="text-xs">Admin</span>
@@ -90,34 +93,34 @@ const Register = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* General Fields */}
+                    {/* Common Fields */}
                     <div className="space-y-4">
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Full Name</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase">Full Name</label>
                             <div className="input-group">
                                 <User size={18} />
                                 <input name="name" required className="input-field" placeholder="John Doe" value={formData.name} onChange={handleInputChange} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Email</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase">Email Address</label>
                             <div className="input-group">
                                 <Mail size={18} />
                                 <input name="email" type="email" required className="input-field" placeholder="john@example.com" value={formData.email} onChange={handleInputChange} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Password</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase">Password</label>
                             <div className="input-group">
                                 <Lock size={18} />
                                 <input name="password" type="password" required className="input-field" placeholder="••••••••" value={formData.password} onChange={handleInputChange} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase">Phone Number</label>
                             <div className="input-group">
                                 <Phone size={18} />
-                                <input name="phone" required className="input-field" placeholder="+1 234 567 890" value={formData.phone} onChange={handleInputChange} />
+                                <input name="phone" required className="input-field" placeholder="+91 12345 67890" value={formData.phone} onChange={handleInputChange} />
                             </div>
                         </div>
                     </div>
@@ -126,11 +129,11 @@ const Register = () => {
                     <div className="space-y-4">
                         {role === 'DONOR' && (
                             <div className="space-y-1">
-                                <label className="text-sm font-medium text-gray-700">Blood Group</label>
+                                <label className="text-xs font-bold text-gray-600 uppercase">Blood Group</label>
                                 <div className="input-group">
                                     <Droplets size={18} />
                                     <select name="details.bloodGroup" required className="input-field" value={formData.details.bloodGroup} onChange={handleInputChange}>
-                                        <option value="">Select Blood Group</option>
+                                        <option value="">Select Group</option>
                                         {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
                                     </select>
                                 </div>
@@ -140,44 +143,44 @@ const Register = () => {
                         {role === 'HOSPITAL' && (
                             <>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Hospital Name</label>
+                                    <label className="text-xs font-bold text-gray-600 uppercase">Hospital Name</label>
                                     <div className="input-group">
                                         <Building2 size={18} />
                                         <input name="details.hospitalName" required className="input-field" placeholder="City General Hospital" value={formData.details.hospitalName} onChange={handleInputChange} />
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Full Address</label>
+                                    <label className="text-xs font-bold text-gray-600 uppercase">Full Address</label>
                                     <div className="input-group">
                                         <MapPin size={18} />
-                                        <input name="details.address" required className="input-field" placeholder="123 Medical St" value={formData.details.address} onChange={handleInputChange} />
+                                        <input name="details.address" required className="input-field" placeholder="Street Address" value={formData.details.address} onChange={handleInputChange} />
                                     </div>
                                 </div>
                             </>
                         )}
 
                         {role === 'ADMIN' && (
-                            <div className="p-6 bg-medical-dark/5 rounded-2xl border border-medical-dark/10 flex flex-col items-center text-center gap-3">
+                            <div className="p-6 bg-medical-dark/5 rounded-2xl border border-medical-dark/10 flex flex-col items-center text-center gap-2">
                                 <Shield className="text-medical-dark" size={32} />
-                                <p className="text-sm font-bold text-gray-700 uppercase tracking-widest">Admin Registration</p>
-                                <p className="text-xs text-gray-500">Creating a system administrator account. Location and blood group details are not required.</p>
+                                <p className="text-xs font-bold text-gray-700 uppercase tracking-widest">Administrative Role</p>
+                                <p className="text-[10px] text-gray-500 italic">No additional location or blood data required for system admins.</p>
                             </div>
                         )}
 
                         {role !== 'ADMIN' && (
                             <>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">City</label>
+                                    <label className="text-xs font-bold text-gray-600 uppercase">City</label>
                                     <div className="input-group">
                                         <MapPin size={18} />
-                                        <input name="details.city" required className="input-field" placeholder="New York" value={formData.details.city} onChange={handleInputChange} />
+                                        <input name="details.city" required className="input-field" placeholder="City Name" value={formData.details.city} onChange={handleInputChange} />
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Pincode</label>
+                                    <label className="text-xs font-bold text-gray-600 uppercase">Pincode</label>
                                     <div className="input-group">
                                         <MapPin size={18} />
-                                        <input name="details.pincode" required className="input-field" placeholder="10001" value={formData.details.pincode} onChange={handleInputChange} />
+                                        <input name="details.pincode" required className="input-field" placeholder="123456" value={formData.details.pincode} onChange={handleInputChange} />
                                     </div>
                                 </div>
                             </>
@@ -188,17 +191,17 @@ const Register = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white transition-all shadow-lg ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90' :
-                                role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
-                                    'bg-medical-dark hover:bg-medical-dark/90'
+                            className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg uppercase tracking-widest text-sm ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90' :
+                                    role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
+                                        'bg-medical-dark hover:bg-medical-dark/90'
                                 }`}
                         >
-                            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Create Account'}
+                            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div> : 'Create Account'}
                         </button>
                     </div>
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
                     <p className="text-gray-500">
                         Already have an account?{' '}
                         <Link to="/login" className="font-bold text-medical-primary hover:underline">
@@ -208,9 +211,9 @@ const Register = () => {
                     <Link
                         to="/login"
                         state={{ fromAdmin: true }}
-                        className="flex items-center gap-2 text-medical-dark font-black uppercase tracking-widest text-[10px] bg-medical-dark/5 px-4 py-2 rounded-full hover:bg-medical-dark hover:text-white transition-all"
+                        className="flex items-center gap-2 text-medical-dark font-black tracking-widest bg-medical-dark/5 px-4 py-2 rounded-full hover:bg-medical-dark hover:text-white transition-all"
                     >
-                        <Shield size={14} /> Admin Portal
+                        <Shield size={14} /> ADMIN PORTAL
                     </Link>
                 </div>
             </div>
