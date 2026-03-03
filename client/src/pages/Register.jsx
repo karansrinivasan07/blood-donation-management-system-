@@ -55,84 +55,84 @@ const Register = () => {
 
     return (
         <div className="max-w-2xl mx-auto mt-6 px-4 pb-20">
-            <div className="glass-card p-8">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold">Join the Movement</h2>
-                    <p className="text-gray-500">Create an account to save lives</p>
+            <div className="glass-card p-8 bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl">
+                <div className="text-center mb-10">
+                    <h2 className="text-4xl font-black text-gray-800 tracking-tight">Join the Movement</h2>
+                    <p className="text-gray-500 mt-2 font-medium">Create your account to start saving lives today</p>
                 </div>
 
                 {/* Role Selector */}
-                <div className="grid grid-cols-3 gap-3 mb-8">
+                <div className="grid grid-cols-3 gap-4 mb-10">
                     <button
                         type="button"
                         onClick={() => setRole('DONOR')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                        className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${role === 'DONOR' ? 'border-medical-primary bg-medical-primary/5 text-medical-primary shadow-lg shadow-medical-primary/10' : 'border-gray-100 text-gray-400 grayscale'
                             }`}
                     >
-                        <User size={32} />
-                        <span className="text-xs">Donor</span>
+                        <User size={36} />
+                        <span className="text-xs font-black uppercase tracking-widest">Donor</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('HOSPITAL')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                        className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${role === 'HOSPITAL' ? 'border-medical-secondary bg-medical-secondary/5 text-medical-secondary shadow-lg shadow-medical-secondary/10' : 'border-gray-100 text-gray-400 grayscale'
                             }`}
                     >
-                        <Building2 size={32} />
-                        <span className="text-xs">Hospital</span>
+                        <Building2 size={36} />
+                        <span className="text-xs font-black uppercase tracking-widest">Hospital</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('ADMIN')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark font-bold' : 'border-gray-100 text-gray-400 grayscale'
+                        className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark shadow-lg shadow-medical-dark/10' : 'border-gray-100 text-gray-400 grayscale'
                             }`}
                     >
-                        <Shield size={32} />
-                        <span className="text-xs">Admin</span>
+                        <Shield size={36} />
+                        <span className="text-xs font-black uppercase tracking-widest">Admin</span>
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Common Fields */}
-                    <div className="space-y-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-600 uppercase">Full Name</label>
-                            <div className="input-group">
-                                <User size={18} />
-                                <input name="name" required className="input-field" placeholder="John Doe" value={formData.name} onChange={handleInputChange} />
+                    <div className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                            <div className="input-group group focus-within:ring-2 focus-within:ring-medical-primary/20 transition-all">
+                                <User size={18} className="text-gray-400 group-focus-within:text-medical-primary" />
+                                <input name="name" required className="input-field border-none shadow-none focus:ring-0" placeholder="John Doe" value={formData.name} onChange={handleInputChange} />
                             </div>
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-600 uppercase">Email Address</label>
-                            <div className="input-group">
-                                <Mail size={18} />
-                                <input name="email" type="email" required className="input-field" placeholder="john@example.com" value={formData.email} onChange={handleInputChange} />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                            <div className="input-group group focus-within:ring-2 focus-within:ring-medical-primary/20 transition-all">
+                                <Mail size={18} className="text-gray-400 group-focus-within:text-medical-primary" />
+                                <input name="email" type="email" required className="input-field border-none shadow-none focus:ring-0" placeholder="john@example.com" value={formData.email} onChange={handleInputChange} />
                             </div>
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-600 uppercase">Password</label>
-                            <div className="input-group">
-                                <Lock size={18} />
-                                <input name="password" type="password" required className="input-field" placeholder="••••••••" value={formData.password} onChange={handleInputChange} />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Secret Password</label>
+                            <div className="input-group group focus-within:ring-2 focus-within:ring-medical-primary/20 transition-all">
+                                <Lock size={18} className="text-gray-400 group-focus-within:text-medical-primary" />
+                                <input name="password" type="password" required className="input-field border-none shadow-none focus:ring-0" placeholder="••••••••" value={formData.password} onChange={handleInputChange} />
                             </div>
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-600 uppercase">Phone Number</label>
-                            <div className="input-group">
-                                <Phone size={18} />
-                                <input name="phone" required className="input-field" placeholder="+91 12345 67890" value={formData.phone} onChange={handleInputChange} />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Contact</label>
+                            <div className="input-group group focus-within:ring-2 focus-within:ring-medical-primary/20 transition-all">
+                                <Phone size={18} className="text-gray-400 group-focus-within:text-medical-primary" />
+                                <input name="phone" required className="input-field border-none shadow-none focus:ring-0" placeholder="+91 12345 67890" value={formData.phone} onChange={handleInputChange} />
                             </div>
                         </div>
                     </div>
 
                     {/* Role Specific Fields */}
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                         {role === 'DONOR' && (
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-600 uppercase">Blood Group</label>
-                                <div className="input-group">
-                                    <Droplets size={18} />
-                                    <select name="details.bloodGroup" required className="input-field" value={formData.details.bloodGroup} onChange={handleInputChange}>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Blood Group</label>
+                                <div className="input-group group focus-within:ring-2 focus-within:ring-medical-primary/20 transition-all">
+                                    <Droplets size={18} className="text-gray-400 group-focus-within:text-medical-primary" />
+                                    <select name="details.bloodGroup" required className="input-field border-none shadow-none focus:ring-0" value={formData.details.bloodGroup} onChange={handleInputChange}>
                                         <option value="">Select Group</option>
                                         {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
                                     </select>
@@ -142,78 +142,80 @@ const Register = () => {
 
                         {role === 'HOSPITAL' && (
                             <>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-600 uppercase">Hospital Name</label>
-                                    <div className="input-group">
-                                        <Building2 size={18} />
-                                        <input name="details.hospitalName" required className="input-field" placeholder="City General Hospital" value={formData.details.hospitalName} onChange={handleInputChange} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Hospital Name</label>
+                                    <div className="input-group group">
+                                        <Building2 size={18} className="text-gray-400" />
+                                        <input name="details.hospitalName" required className="input-field border-none focus:ring-0" placeholder="City General Hospital" value={formData.details.hospitalName} onChange={handleInputChange} />
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-600 uppercase">Full Address</label>
-                                    <div className="input-group">
-                                        <MapPin size={18} />
-                                        <input name="details.address" required className="input-field" placeholder="Street Address" value={formData.details.address} onChange={handleInputChange} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Address</label>
+                                    <div className="input-group group">
+                                        <MapPin size={18} className="text-gray-400" />
+                                        <input name="details.address" required className="input-field border-none focus:ring-0" placeholder="Street Address, Area" value={formData.details.address} onChange={handleInputChange} />
                                     </div>
                                 </div>
                             </>
                         )}
 
                         {role === 'ADMIN' && (
-                            <div className="p-6 bg-medical-dark/5 rounded-2xl border border-medical-dark/10 flex flex-col items-center text-center gap-2">
-                                <Shield className="text-medical-dark" size={32} />
-                                <p className="text-xs font-bold text-gray-700 uppercase tracking-widest">Administrative Role</p>
-                                <p className="text-[10px] text-gray-500 italic">No additional location or blood data required for system admins.</p>
+                            <div className="p-8 bg-medical-dark/5 rounded-3xl border border-medical-dark/10 flex flex-col items-center text-center gap-4">
+                                <Shield className="text-medical-dark animate-pulse" size={40} />
+                                <div className="space-y-1">
+                                    <p className="text-xs font-black text-gray-800 uppercase tracking-[0.2em]">Administrative Security</p>
+                                    <p className="text-[10px] text-gray-500 italic max-w-[180px]">Protected system moderator account. Specialized credentials required.</p>
+                                </div>
                             </div>
                         )}
 
                         {role !== 'ADMIN' && (
                             <>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-600 uppercase">City</label>
-                                    <div className="input-group">
-                                        <MapPin size={18} />
-                                        <input name="details.city" required className="input-field" placeholder="City Name" value={formData.details.city} onChange={handleInputChange} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current City</label>
+                                    <div className="input-group group">
+                                        <MapPin size={18} className="text-gray-400" />
+                                        <input name="details.city" required className="input-field border-none focus:ring-0" placeholder="City Name" value={formData.details.city} onChange={handleInputChange} />
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-600 uppercase">Pincode</label>
-                                    <div className="input-group">
-                                        <MapPin size={18} />
-                                        <input name="details.pincode" required className="input-field" placeholder="123456" value={formData.details.pincode} onChange={handleInputChange} />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pincode</label>
+                                    <div className="input-group group">
+                                        <MapPin size={18} className="text-gray-400" />
+                                        <input name="details.pincode" required className="input-field border-none focus:ring-0" placeholder="123 456" value={formData.details.pincode} onChange={handleInputChange} />
                                     </div>
                                 </div>
                             </>
                         )}
                     </div>
 
-                    <div className="md:col-span-2 pt-4">
+                    <div className="md:col-span-2 pt-6">
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg uppercase tracking-widest text-sm ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90' :
-                                    role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
-                                        'bg-medical-dark hover:bg-medical-dark/90'
+                            className={`w-full py-5 rounded-2xl font-black text-white transition-all duration-300 shadow-xl uppercase tracking-[0.2em] text-sm transform active:scale-[0.98] ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90 hover:shadow-medical-primary/20' :
+                                    role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90 hover:shadow-medical-secondary/20' :
+                                        'bg-medical-dark hover:bg-black hover:shadow-medical-dark/20'
                                 }`}
                         >
-                            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div> : 'Create Account'}
+                            {loading ? <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div> : 'Create Account'}
                         </button>
                     </div>
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-                    <p className="text-gray-500">
-                        Already have an account?{' '}
-                        <Link to="/login" className="font-bold text-medical-primary hover:underline">
-                            Login here
+                <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="flex flex-col items-center sm:items-start">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Existing Member?</p>
+                        <Link to="/login" className="text-sm font-black text-medical-primary hover:text-medical-primary/80 transition-colors uppercase tracking-widest mt-1">
+                            Sign In Now
                         </Link>
-                    </p>
+                    </div>
                     <Link
                         to="/login"
                         state={{ fromAdmin: true }}
-                        className="flex items-center gap-2 text-medical-dark font-black tracking-widest bg-medical-dark/5 px-4 py-2 rounded-full hover:bg-medical-dark hover:text-white transition-all"
+                        className="flex items-center gap-3 text-medical-dark font-black tracking-[0.2em] bg-medical-dark/5 px-6 py-3 rounded-full hover:bg-medical-dark hover:text-white transition-all transform hover:scale-105 shadow-sm text-[10px]"
                     >
-                        <Shield size={14} /> ADMIN PORTAL
+                        <Shield size={16} /> ADMIN PORTAL
                     </Link>
                 </div>
             </div>
