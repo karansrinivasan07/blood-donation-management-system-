@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { Search, UserCheck, UserMinus, Shield } from 'lucide-react';
+import { Search, UserCheck, UserMinus, Shield, Trash2 } from 'lucide-react';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -34,6 +34,17 @@ const Users = () => {
         }
     };
 
+    const deleteUser = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this user? This cannot be undone.')) return;
+        try {
+            await api.delete(`/admin/users/${id}`);
+            toast.success('User deleted successfully');
+            fetchUsers();
+        } catch (err) {
+            toast.error('Failed to delete user');
+        }
+    };
+
     const filteredUsers = users.filter(u =>
         u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -43,8 +54,8 @@ const Users = () => {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold">User Management</h1>
-                    <p className="text-gray-500">Monitor and manage all system participants</p>
+                    <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
+                    <p className="text-gray-500 font-medium">Monitor and manage all system participants</p>
                 </div>
 
                 <div className="relative">
@@ -59,16 +70,16 @@ const Users = () => {
                 </div>
             </div>
 
-            <div className="glass-card overflow-hidden">
+            <div className="glass-card border-none shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100">
+                        <thead className="bg-gray-50/50 border-b border-gray-100">
                             <tr>
-                                <th className="px-6 py-4 text-sm font-bold text-gray-600">User</th>
-                                <th className="px-6 py-4 text-sm font-bold text-gray-600">Role</th>
-                                <th className="px-6 py-4 text-sm font-bold text-gray-600">Status</th>
-                                <th className="px-6 py-4 text-sm font-bold text-gray-600">Joined</th>
-                                <th className="px-6 py-4 text-sm font-bold text-gray-600 text-right">Actions</th>
+                                <th className="px-6 py-5 text-sm font-bold text-gray-600">User</th>
+                                <th className="px-6 py-5 text-sm font-bold text-gray-600">Role</th>
+                                <th className="px-6 py-5 text-sm font-bold text-gray-600">Status</th>
+                                <th className="px-6 py-5 text-sm font-bold text-gray-600">Joined</th>
+                                <th className="px-6 py-5 text-sm font-bold text-gray-600 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -78,34 +89,43 @@ const Users = () => {
                                 <tr key={u._id} className="hover:bg-gray-50/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="font-bold text-gray-800">{u.name}</div>
-                                        <div className="text-xs text-gray-400">{u.email}</div>
+                                        <div className="text-xs text-gray-400 font-semibold uppercase">{u.email}</div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold tracking-wider ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                                                u.role === 'HOSPITAL' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
+                                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700 border border-purple-200' :
+                                            u.role === 'HOSPITAL' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-red-100 text-red-700 border border-red-200'
                                             }`}>
                                             {u.role}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`flex items-center gap-1.5 text-sm font-semibold ${u.status === 'ACTIVE' ? 'text-green-600' : 'text-red-600'}`}>
-                                            <span className={`w-2 h-2 rounded-full ${u.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                        <span className={`flex items-center gap-2 text-xs font-black uppercase ${u.status === 'ACTIVE' ? 'text-green-600' : 'text-orange-600'}`}>
+                                            <span className={`w-2 h-2 rounded-full ${u.status === 'ACTIVE' ? 'bg-green-500' : 'bg-orange-500'}`}></span>
                                             {u.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                    <td className="px-6 py-4 text-sm font-medium text-gray-500">
                                         {new Date(u.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         {u.role !== 'ADMIN' && (
-                                            <button
-                                                onClick={() => toggleStatus(u._id, u.status)}
-                                                className={`p-2 rounded-lg transition-all ${u.status === 'ACTIVE' ? 'text-red-500 hover:bg-red-50' : 'text-green-500 hover:bg-green-50'
-                                                    }`}
-                                                title={u.status === 'ACTIVE' ? 'Block User' : 'Activate User'}
-                                            >
-                                                {u.status === 'ACTIVE' ? <UserMinus size={20} /> : <UserCheck size={20} />}
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => toggleStatus(u._id, u.status)}
+                                                    className={`p-2 rounded-xl transition-all ${u.status === 'ACTIVE' ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50'
+                                                        }`}
+                                                    title={u.status === 'ACTIVE' ? 'Block User' : 'Activate User'}
+                                                >
+                                                    {u.status === 'ACTIVE' ? <UserMinus size={20} /> : <UserCheck size={20} />}
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteUser(u._id)}
+                                                    className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-all"
+                                                    title="Delete User"
+                                                >
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </div>
                                         )}
                                     </td>
                                 </tr>

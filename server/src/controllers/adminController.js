@@ -78,3 +78,34 @@ exports.getAnalytics = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Delete associated profiles
+        if (user.role === 'DONOR') {
+            await DonorProfile.deleteOne({ userId: user._id });
+        } else if (user.role === 'HOSPITAL') {
+            await HospitalProfile.deleteOne({ userId: user._id });
+        }
+
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ message: 'User deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.deleteRequest = async (req, res) => {
+    try {
+        const request = await BloodRequest.findById(req.params.id);
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+
+        await BloodRequest.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Request deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};

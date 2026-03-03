@@ -33,51 +33,65 @@ const HospitalProfile = lazyWithRetry(() => import('./pages/hospital/Profile'));
 const AdminUsers = lazyWithRetry(() => import('./pages/admin/Users'));
 const AdminRequests = lazyWithRetry(() => import('./pages/admin/Requests'));
 const AdminAnalytics = lazyWithRetry(() => import('./pages/admin/Analytics'));
+const AdminLayout = lazyWithRetry(() => import('./components/admin/AdminLayout'));
 
+
+const AppContent = () => {
+    const { user } = useAuth();
+    // Using a more robust way to detect admin path in React Router context if needed, 
+    // but window.location works for initial render.
+    const isAdminPath = window.location.pathname.startsWith('/admin');
+
+    return (
+        <div className="min-h-screen bg-medical-light">
+            {!isAdminPath && <Navbar />}
+            <main className={`${!isAdminPath ? 'container mx-auto px-4 py-8' : ''}`}>
+                <React.Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="w-8 h-8 border-4 border-medical-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+
+                        {/* Donor Routes */}
+                        <Route element={<ProtectedRoute allowedRoles={['DONOR']} />}>
+                            <Route path="/donor/dashboard" element={<DonorDashboard />} />
+                            <Route path="/donor/profile" element={<DonorProfile />} />
+                            <Route path="/donor/my-pledges" element={<MyPledges />} />
+                            <Route path="/donor/leaderboard" element={<Leaderboard />} />
+                            <Route path="/donor/requests/:id" element={<RequestDetails />} />
+                        </Route>
+
+                        {/* Hospital Routes */}
+                        <Route element={<ProtectedRoute allowedRoles={['HOSPITAL']} />}>
+                            <Route path="/hospital/dashboard" element={<HospitalDashboard />} />
+                            <Route path="/hospital/create-request" element={<CreateRequest />} />
+                            <Route path="/hospital/requests/:id" element={<HospitalRequestDetails />} />
+                            <Route path="/hospital/profile" element={<HospitalProfile />} />
+                        </Route>
+
+                        {/* Admin Routes */}
+                        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                            <Route element={<AdminLayout />}>
+                                <Route path="/admin/users" element={<AdminUsers />} />
+                                <Route path="/admin/requests" element={<AdminRequests />} />
+                                <Route path="/admin/analytics" element={<AdminAnalytics />} />
+                            </Route>
+                        </Route>
+
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </React.Suspense>
+            </main>
+            <Toaster position="bottom-right" />
+        </div>
+    );
+};
 
 const App = () => {
     return (
         <Router>
             <AuthProvider>
-                <div className="min-h-screen bg-medical-light">
-                    <Navbar />
-                    <main className="container mx-auto px-4 py-8">
-                        <React.Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="w-8 h-8 border-4 border-medical-primary border-t-transparent rounded-full animate-spin"></div></div>}>
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/register" element={<Register />} />
-
-                                {/* Donor Routes */}
-                                <Route element={<ProtectedRoute allowedRoles={['DONOR']} />}>
-                                    <Route path="/donor/dashboard" element={<DonorDashboard />} />
-                                    <Route path="/donor/profile" element={<DonorProfile />} />
-                                    <Route path="/donor/my-pledges" element={<MyPledges />} />
-                                    <Route path="/donor/leaderboard" element={<Leaderboard />} />
-                                    <Route path="/donor/requests/:id" element={<RequestDetails />} />
-                                </Route>
-
-                                {/* Hospital Routes */}
-                                <Route element={<ProtectedRoute allowedRoles={['HOSPITAL']} />}>
-                                    <Route path="/hospital/dashboard" element={<HospitalDashboard />} />
-                                    <Route path="/hospital/create-request" element={<CreateRequest />} />
-                                    <Route path="/hospital/requests/:id" element={<HospitalRequestDetails />} />
-                                    <Route path="/hospital/profile" element={<HospitalProfile />} />
-                                </Route>
-
-                                {/* Admin Routes */}
-                                <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                                    <Route path="/admin/users" element={<AdminUsers />} />
-                                    <Route path="/admin/requests" element={<AdminRequests />} />
-                                    <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                                </Route>
-
-                                <Route path="*" element={<Navigate to="/" replace />} />
-                            </Routes>
-                        </React.Suspense>
-                    </main>
-                    <Toaster position="bottom-right" />
-                </div>
+                <AppContent />
             </AuthProvider>
         </Router>
     );
