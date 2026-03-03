@@ -189,8 +189,8 @@ const Register = () => {
                             type="submit"
                             disabled={loading}
                             className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white transition-all shadow-lg ${role === 'DONOR' ? 'bg-medical-primary hover:bg-medical-primary/90' :
-                                    role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
-                                        'bg-medical-dark hover:bg-medical-dark/90'
+                                role === 'HOSPITAL' ? 'bg-medical-secondary hover:bg-medical-secondary/90' :
+                                    'bg-medical-dark hover:bg-medical-dark/90'
                                 }`}
                         >
                             {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Create Account'}
@@ -198,12 +198,21 @@ const Register = () => {
                     </div>
                 </form>
 
-                <p className="mt-8 text-center text-gray-600 text-sm">
-                    Already have an account?{' '}
-                    <Link to="/login" className="font-semibold text-medical-primary hover:underline">
-                        Login here
+                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+                    <p className="text-gray-500">
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-bold text-medical-primary hover:underline">
+                            Login here
+                        </Link>
+                    </p>
+                    <Link
+                        to="/login"
+                        state={{ fromAdmin: true }}
+                        className="flex items-center gap-2 text-medical-dark font-black uppercase tracking-widest text-[10px] bg-medical-dark/5 px-4 py-2 rounded-full hover:bg-medical-dark hover:text-white transition-all"
+                    >
+                        <Shield size={14} /> Admin Portal
                     </Link>
-                </p>
+                </div>
             </div>
         </div>
     );
