@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
-import { UserPlus, Mail, Lock, User, Phone, MapPin, Building2, Droplets } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Phone, MapPin, Building2, Droplets, Shield } from 'lucide-react';
 
 const Register = () => {
     const [role, setRole] = useState('DONOR');
@@ -43,7 +43,8 @@ const Register = () => {
             await register({ ...formData, role });
             toast.success('Registration successful!');
             if (role === 'DONOR') navigate('/donor/dashboard');
-            else navigate('/hospital/dashboard');
+            else if (role === 'HOSPITAL') navigate('/hospital/dashboard');
+            else if (role === 'ADMIN') navigate('/admin/analytics');
         } catch (err) {
             const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Registration failed';
             toast.error(errorMsg);
@@ -77,6 +78,14 @@ const Register = () => {
                     >
                         <Building2 size={32} />
                         <span className="font-bold">Hospital/Bank</span>
+                    </button>
+                    <button
+                        onClick={() => setRole('ADMIN')}
+                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === 'ADMIN' ? 'border-medical-dark bg-medical-dark/5 text-medical-dark' : 'border-gray-100 text-gray-400 grayscale'
+                            }`}
+                    >
+                        <Shield size={32} />
+                        <span className="font-bold">Admin</span>
                     </button>
                 </div>
 
@@ -115,20 +124,20 @@ const Register = () => {
 
                     {/* Role Specific Fields */}
                     <div className="space-y-4">
-                        {role === 'DONOR' ? (
-                            <>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Blood Group</label>
-                                    <div className="input-group">
-                                        <Droplets size={18} />
-                                        <select name="details.bloodGroup" required className="input-field" value={formData.details.bloodGroup} onChange={handleInputChange}>
-                                            <option value="">Select Blood Group</option>
-                                            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                                        </select>
-                                    </div>
+                        {role === 'DONOR' && (
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium text-gray-700">Blood Group</label>
+                                <div className="input-group">
+                                    <Droplets size={18} />
+                                    <select name="details.bloodGroup" required className="input-field" value={formData.details.bloodGroup} onChange={handleInputChange}>
+                                        <option value="">Select Blood Group</option>
+                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                    </select>
                                 </div>
-                            </>
-                        ) : (
+                            </div>
+                        )}
+
+                        {role === 'HOSPITAL' && (
                             <>
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium text-gray-700">Hospital Name</label>
@@ -146,20 +155,33 @@ const Register = () => {
                                 </div>
                             </>
                         )}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">City</label>
-                            <div className="input-group">
-                                <MapPin size={18} />
-                                <input name="details.city" required className="input-field" placeholder="New York" value={formData.details.city} onChange={handleInputChange} />
+
+                        {role === 'ADMIN' && (
+                            <div className="p-6 bg-medical-dark/5 rounded-2xl border border-medical-dark/10 flex flex-col items-center text-center gap-3">
+                                <Shield className="text-medical-dark" size={32} />
+                                <p className="text-sm font-bold text-gray-700 uppercase tracking-widest">Admin Registration</p>
+                                <p className="text-xs text-gray-500">Creating a system administrator account. Location and blood group details are not required.</p>
                             </div>
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Pincode</label>
-                            <div className="input-group">
-                                <MapPin size={18} />
-                                <input name="details.pincode" required className="input-field" placeholder="10001" value={formData.details.pincode} onChange={handleInputChange} />
-                            </div>
-                        </div>
+                        )}
+
+                        {role !== 'ADMIN' && (
+                            <>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-gray-700">City</label>
+                                    <div className="input-group">
+                                        <MapPin size={18} />
+                                        <input name="details.city" required className="input-field" placeholder="New York" value={formData.details.city} onChange={handleInputChange} />
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-gray-700">Pincode</label>
+                                    <div className="input-group">
+                                        <MapPin size={18} />
+                                        <input name="details.pincode" required className="input-field" placeholder="10001" value={formData.details.pincode} onChange={handleInputChange} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     <div className="md:col-span-2 pt-4">
